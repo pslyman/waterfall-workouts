@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      OpenFit
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">OpenFit</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngFor="let item of workoutNames">
+    <ion-card-content class="card-flex">
+      <div>
+        <h1>{{item.name}}</h1>
+        Sets: {{item.sets}}<br />
+        Reps: {{item.reps}}<br />
+        Weight: {{item.weight}}<br />
+        Day limit: {{item.days}}
+      </div>
+      <div class="vertical-buttons">
+        <ion-button color="light">Done</ion-button>
+        <div>
+          <ion-button color="medium">-</ion-button
+          ><ion-button color="medium">+</ion-button>
+        </div>
+        <ion-button color="dark">Edit</ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

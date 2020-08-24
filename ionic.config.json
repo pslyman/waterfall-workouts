@@ -1,0 +1,7 @@
+{
+  "name": "OpenFit",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
