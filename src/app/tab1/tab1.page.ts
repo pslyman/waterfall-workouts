@@ -3,6 +3,20 @@ import { Component, OnInit } from "@angular/core";
 import { ToastController } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
 import { Insomnia } from "@ionic-native/insomnia/ngx";
+import { Storage } from "@ionic/storage";
+
+interface workoutsInt {
+  days: number;
+  name: string;
+  sets: number;
+  reps: number;
+  weight: string;
+  countdown: number;
+  originDate: number;
+  setsDone: number;
+  timeLeft: string;
+  notes: string;
+}
 
 @Component({
   selector: "app-tab1",
@@ -19,11 +33,28 @@ import { Insomnia } from "@ionic-native/insomnia/ngx";
         animate(".5s ease-in", style({ bottom: "200%" })),
       ]),
     ]),
+
+    [
+      trigger("cardIn", [
+        transition(":enter", [
+          style({ transform: "scale(1.2)", top: "75px" }),
+          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 }))
+        ]),
+      ]),
+    ],
+    [
+      trigger("headerSlide", [
+        transition(":enter", [
+          style({ transform: "scale(1.2)", top: "-75px" }),
+          animate("1s ease-out", style({ transform: "scale(1)", top: 0 }))
+        ]),
+      ]),
+    ],
   ],
 })
 export class Tab1Page implements OnInit {
-  workoutNames = [
-    {
+  workoutNames: workoutsInt[] = [
+    /* {
       days: 3,
       name: "Squats",
       sets: 3,
@@ -35,7 +66,7 @@ export class Tab1Page implements OnInit {
       timeLeft: ".1",
       notes:
         "It's like you're sitting in a chair, but there's actually no chair.",
-    },
+    }, */
   ];
 
   newName = "";
@@ -62,10 +93,19 @@ export class Tab1Page implements OnInit {
   constructor(
     public toastController: ToastController,
     public alertController: AlertController,
-    private insomnia: Insomnia
+    private insomnia: Insomnia,
+    private storage: Storage
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getStorage();
+  }
+
+  getStorage() {
+    this.storage.get("workouts").then((list) => {
+      this.workoutNames = JSON.parse(list);
+    });
+  }
 
   getCurrentTimeNumber() {
     let d = new Date();
@@ -265,6 +305,8 @@ export class Tab1Page implements OnInit {
       notes: this.newNotes,
     });
 
+    this.saveToStorage();
+
     const toast = await this.toastController.create({
       message: `${this.newName} added.`,
       duration: 4000,
@@ -272,6 +314,10 @@ export class Tab1Page implements OnInit {
     toast.present();
 
     this.clearAddWorkout();
+  }
+
+  saveToStorage() {
+    this.storage.set("workouts", JSON.stringify(this.workoutNames));
   }
 
   clearAddWorkout() {
@@ -305,6 +351,8 @@ export class Tab1Page implements OnInit {
             );
             this.inEdit = false;
             this.newActive = false;
+
+            this.saveToStorage();
           },
         },
       ],
@@ -380,6 +428,8 @@ export class Tab1Page implements OnInit {
       match.weight = `${this.newWeight}`;
       match.countdown = this.newCountdown;
     }
+
+    this.saveToStorage();
 
     const toast = await this.toastController.create({
       message: `${this.newName} updated.`,

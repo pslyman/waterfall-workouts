@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar [@cardIn]>
     <ion-title>
       OpenFit
     </ion-title>
@@ -27,7 +27,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card *ngFor="let item of workoutNames">
+  <ion-card *ngFor="let item of workoutNames" [@cardIn]>
     <ion-card-content class="card-flex">
       <div class="max-width-content">
         <h1 class="card-header">{{item.name}}</h1>
