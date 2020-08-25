@@ -10,7 +10,7 @@
         (click)="toggleNew()"
         [ngClass]="{'grey-off': !newActive}"
       >
-        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+        <ion-icon *ngIf="!inEdit && !timerActive" slot="icon-only" name="add-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -26,29 +26,43 @@
   <ion-card *ngFor="let item of workoutNames">
     <ion-card-content class="card-flex">
       <div>
-        <h1>{{item.name}}</h1>
+        <h1 class="card-header">{{item.name}}</h1>
         <div *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0">
           <p *ngIf="item.sets">Sets: {{item.sets - item.setsDone}}</p>
           <p *ngIf="item.reps">Reps: {{item.reps}}</p>
           <p *ngIf="item.weight">Weight: {{item.weight}}</p>
-          <p *ngIf="item.countdown">Time: {{item.countdown}}</p>
+          <p *ngIf="item.countdown">Time: {{item.countdown}} minutes<span > ({{ item.timeLeft }} remainining)</span></p>
           <p *ngIf="item.days">Day limit: {{item.days}}</p>
           <p>Time since: {{getDifferenceBetweenTimes(item.originDate)}}</p>
         </div>
       </div>
-      <div class="vertical-buttons" *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0">
+      <div
+        class="vertical-buttons"
+        *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0"
+      >
         <ion-button (click)="itemDone(item.name)">Done</ion-button>
         <div *ngIf="item.reps">
           <ion-button color="dark" (click)="itemSetSubtraction(item.name)"
             >-</ion-button
-          ><ion-button color="dark" (click)="itemSetAddition(item.name)"
+          ><ion-button
+            color="dark"
+            (click)="itemSetAddition(item.name)"
+            [disabled]="item.setsDone === 0"
             >+</ion-button
           >
         </div>
-        <ion-button color="dark" *ngIf="item.countdown">Run</ion-button>
-        <ion-button color="medium">Edit</ion-button>
+        <ion-button
+          color="dark"
+          *ngIf="item.countdown"
+          (click)="beginTimer(item.name)"
+          >Timer</ion-button
+        >
+        <ion-button color="dark" (click)="editItem(item.name)">Edit</ion-button>
       </div>
-      <div class="vertical-buttons" *ngIf="getDifferenceBetweenTimes(item.originDate) === 0">
+      <div
+        class="vertical-buttons"
+        *ngIf="getDifferenceBetweenTimes(item.originDate) === 0"
+      >
         <ion-button color="dark" (click)="itemRestart(item.name)"
           >Restart</ion-button
         >
@@ -92,19 +106,17 @@
         ></ion-input>
       </ion-item>
       <ion-list>
-        <ion-radio-group (ionChange)="radioChange($event)" [(ngModel)]="useMetric">
+        <ion-radio-group
+          (ionChange)="radioChange($event)"
+          [(ngModel)]="useMetric"
+        >
           <ion-item>
             <ion-label>kg</ion-label>
-            <ion-radio slot="start" value="true" >
-            </ion-radio>
+            <ion-radio slot="start" value="true"> </ion-radio>
           </ion-item>
           <ion-item>
             <ion-label>lbs</ion-label>
-            <ion-radio
-              slot="start"
-              value="false"
-              
-            ></ion-radio>
+            <ion-radio slot="start" value="false"></ion-radio>
           </ion-item> </ion-radio-group
       ></ion-list>
     </ion-card>
@@ -134,8 +146,26 @@
       ><ion-button
         (click)="addNewWorkout()"
         [disabled]="!this.newName"
+        *ngIf="!inEdit"
         >Add New Workout</ion-button
+      ><ion-button
+        (click)="saveChanges()"
+        [disabled]="!this.newName"
+        *ngIf="inEdit"
+        >Save</ion-button
+      ><ion-button (click)="cancelChanges()" color="dark"
+        >Cancel</ion-button
       ></ion-card
+    >
+  </div>
+
+  <div class="new-add-modal" *ngIf="timerActive">
+    <ion-card>
+      <h1 id="timerHTML">GO!</h1>
+    </ion-card>
+
+    <ion-card class="add-workout-bton-container">
+      <ion-button (click)="stopTimer()" color="dark">Stop</ion-button></ion-card
     >
   </div>
 </ion-content>
