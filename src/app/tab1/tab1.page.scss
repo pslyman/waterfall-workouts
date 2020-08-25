@@ -16,7 +16,7 @@
 
 .new-add-modal {
   position: absolute;
-  z-index: 1000;
+  z-index: 90;
   width: 100%;
   height: calc(100% - 56px);
   bottom: 0;
@@ -51,4 +51,8 @@
 
 .item-notes {
     border-top: 1px solid var(--ion-color-step-200);
+}
+
+ion-header{
+    z-index: 100;
 }

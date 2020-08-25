@@ -85,7 +85,7 @@
     </ion-card-content>
   </ion-card>
 
-  <div class="new-add-modal" *ngIf="newActive">
+  <div class="new-add-modal" *ngIf="newActive" [@inOutAnimation]>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">*Name</ion-label>
@@ -188,9 +188,9 @@
     >
   </div>
 
-  <div class="new-add-modal" *ngIf="timerActive">
+  <div class="new-add-modal" *ngIf="timerActive" [@inOutAnimation]>
     <ion-card>
-      <h1 id="timerHTML">GO!</h1>
+      <h1 id="timerHTML">GO!<br>--:--:--</h1>
     </ion-card>
 
     <ion-card class="add-workout-bton-container">

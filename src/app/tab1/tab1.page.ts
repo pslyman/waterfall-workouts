@@ -1,3 +1,10 @@
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+} from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { ToastController } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
@@ -7,6 +14,18 @@ import { Insomnia } from "@ionic-native/insomnia/ngx";
   selector: "app-tab1",
   templateUrl: "tab1.page.html",
   styleUrls: ["tab1.page.scss"],
+  animations: [
+    trigger("inOutAnimation", [
+      transition(":enter", [
+        style({ bottom: "200%" }),
+        animate(".5s ease-out", style({ bottom: "0" })),
+      ]),
+      transition(":leave", [
+        style({ bottom: 0 }),
+        animate(".5s ease-in", style({ bottom: "200%" })),
+      ]),
+    ]),
+  ],
 })
 export class Tab1Page implements OnInit {
   workoutNames = [
@@ -187,7 +206,7 @@ export class Tab1Page implements OnInit {
       if (distance < 0) {
         document.getElementById(
           "timerHTML"
-        ).innerHTML = `${itemName} timer <br /> 0:0:0 <br />Time's up!`;
+        ).innerHTML = `${itemName} timer <br /> Time's up!`;
       }
     }, 1000);
   }

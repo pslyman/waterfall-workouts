@@ -1,3 +1,4 @@
+
 import { Insomnia } from '@ionic-native/insomnia/ngx';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
@@ -7,6 +8,7 @@ import { Tab1Page } from './tab1.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
+
 
 @NgModule({
   imports: [
