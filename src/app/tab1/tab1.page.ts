@@ -254,14 +254,16 @@ export class Tab1Page implements OnInit {
   }
 
   async addNewWorkout() {
-    if (this.workoutNames.some((i) => i.name === this.newName)) {
-      const toast = await this.toastController.create({
-        message: `"${this.newName}" already exists`,
-        duration: 2000,
-      });
-      toast.present();
+    if (this.workoutNames) {
+      if (this.workoutNames.some((i) => i.name === this.newName)) {
+        const toast = await this.toastController.create({
+          message: `"${this.newName}" already exists`,
+          duration: 2000,
+        });
+        toast.present();
 
-      return;
+        return;
+      }
     }
 
     if (this.newWeight) {
@@ -277,6 +279,10 @@ export class Tab1Page implements OnInit {
     if (!this.newDays) {
       this.newDays = 3;
     }
+
+    console.log(this.workoutNames);
+
+    this.workoutNames = this.workoutNames || [];
 
     this.workoutNames.push({
       days: this.newDays,
