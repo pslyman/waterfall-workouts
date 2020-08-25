@@ -1,10 +1,4 @@
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition,
-} from "@angular/animations";
+import { trigger, style, animate, transition } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { ToastController } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
@@ -164,6 +158,8 @@ export class Tab1Page implements OnInit {
       }
     }
 
+    let audio = new Audio("../../assets/alarmSound.mp3");
+
     // Set the date we're counting down to
     let countDownDate = new Date(
       new Date().valueOf() + Number(timerAmount) * 60100
@@ -207,6 +203,7 @@ export class Tab1Page implements OnInit {
         document.getElementById(
           "timerHTML"
         ).innerHTML = `${itemName} timer <br /> Time's up!`;
+        audio.play();
       }
     }, 1000);
   }
