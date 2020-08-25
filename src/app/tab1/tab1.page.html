@@ -10,7 +10,11 @@
         (click)="toggleNew()"
         [ngClass]="{'grey-off': !newActive}"
       >
-        <ion-icon *ngIf="!inEdit && !timerActive" slot="icon-only" name="add-circle"></ion-icon>
+        <ion-icon
+          *ngIf="!inEdit && !timerActive"
+          slot="icon-only"
+          name="add-circle"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -25,15 +29,26 @@
 
   <ion-card *ngFor="let item of workoutNames">
     <ion-card-content class="card-flex">
-      <div>
+      <div class="max-width-content">
         <h1 class="card-header">{{item.name}}</h1>
         <div *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0">
-          <p *ngIf="item.sets">Sets: {{item.sets - item.setsDone}}</p>
-          <p *ngIf="item.reps">Reps: {{item.reps}}</p>
+          <p *ngIf="item.sets || item.reps">
+            <span *ngIf="item.sets">Sets: {{item.sets - item.setsDone}}</span
+            ><span *ngIf="item.sets && item.reps"> | </span
+            ><span *ngIf="item.reps">Reps: {{item.reps}}</span>
+          </p>
           <p *ngIf="item.weight">Weight: {{item.weight}}</p>
-          <p *ngIf="item.countdown">Time: {{item.countdown}} minutes<span > ({{ item.timeLeft }} remainining)</span></p>
-          <p *ngIf="item.days">Day limit: {{item.days}}</p>
-          <p>Time since: {{getDifferenceBetweenTimes(item.originDate)}}</p>
+          <p *ngIf="item.countdown">
+            Time: {{item.countdown}} minutes<span>
+              ({{ item.timeLeft }} left)</span
+            >
+          </p>
+          <p>
+            Days since: {{getDifferenceBetweenTimes(item.originDate)}}
+            ({{item.days}} max)
+          </p>
+
+          <p *ngIf="item.notes" class="item-notes">{{ item.notes }}</p>
         </div>
       </div>
       <div
@@ -141,8 +156,21 @@
       </ion-item>
       <ion-item><p class="required-text">*required</p></ion-item>
     </ion-card>
+    <ion-card>
+      <ion-item>
+        <ion-label position="stacked">Notes</ion-label>
+        <ion-input
+          placeholder="Anything you'll forget?"
+          [(ngModel)]="newNotes"
+        ></ion-input>
+      </ion-item>
+    </ion-card>
     <ion-card class="add-workout-bton-container">
-      <ion-button color="dark" (click)="clearAddWorkout()">Clear</ion-button
+      <ion-button color="danger" (click)="deleteWorkout()" *ngIf="inEdit"
+        >Remove</ion-button
+      >
+      <ion-button color="dark" (click)="clearAddWorkout()" *ngIf="!inEdit"
+        >Clear</ion-button
       ><ion-button
         (click)="addNewWorkout()"
         [disabled]="!this.newName"
@@ -154,7 +182,8 @@
         *ngIf="inEdit"
         >Save</ion-button
       ><ion-button (click)="cancelChanges()" color="dark"
-        >Cancel</ion-button
+        ><span *ngIf="!inEdit">Close</span
+        ><span *ngIf="inEdit">Cancel</span></ion-button
       ></ion-card
     >
   </div>

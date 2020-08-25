@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ToastController } from "@ionic/angular";
-import { async } from "rxjs/internal/scheduler/async";
+import { AlertController } from "@ionic/angular";
+import { Insomnia } from "@ionic-native/insomnia/ngx";
 
 @Component({
   selector: "app-tab1",
@@ -19,6 +20,8 @@ export class Tab1Page implements OnInit {
       originDate: 1598248800000 - 100000000,
       setsDone: 0,
       timeLeft: ".1",
+      notes:
+        "It's like you're sitting in a chair, but there's actually no chair.",
     },
   ];
 
@@ -29,6 +32,7 @@ export class Tab1Page implements OnInit {
   newWeight = "";
   newWeightType = "";
   newCountdown = null;
+  newNotes = "";
 
   newActive = false;
 
@@ -42,7 +46,11 @@ export class Tab1Page implements OnInit {
 
   thatTimerThing;
 
-  constructor(public toastController: ToastController) {}
+  constructor(
+    public toastController: ToastController,
+    public alertController: AlertController,
+    private insomnia: Insomnia
+  ) {}
 
   ngOnInit() {}
 
@@ -78,7 +86,7 @@ export class Tab1Page implements OnInit {
 
     if (!!match) {
       match.originDate = this.getCurrentTimeNumber() - 100000000;
-      match.timeLeft = match.countdown.toString();
+      match.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
     }
   }
 
@@ -104,6 +112,10 @@ export class Tab1Page implements OnInit {
 
   setTimerActive() {
     this.timerActive = true;
+    this.insomnia.keepAwake().then(
+      () => console.log("success"),
+      () => console.log("error")
+    );
   }
 
   beginTimer(itemName) {
@@ -161,7 +173,11 @@ export class Tab1Page implements OnInit {
       }
       if (!this.timerActive) {
         if (!!match) {
-          if ((!hours || hours < 0) && (!minutes || minutes < 0) && (!seconds || seconds < 0)) {
+          if (
+            (!hours || hours < 0) &&
+            (!minutes || minutes < 0) &&
+            (!seconds || seconds < 0)
+          ) {
             match.timeLeft = "";
           } else {
             match.timeLeft = `${hours}:${minutes}:${seconds}`;
@@ -178,13 +194,17 @@ export class Tab1Page implements OnInit {
 
   stopTimer() {
     this.timerActive = false;
+    this.insomnia.allowSleepAgain().then(
+      () => console.log("success"),
+      () => console.log("error")
+    );
     clearInterval(this.thatTimerThing);
-    
-    this.workoutNames.forEach(i => {
+
+    this.workoutNames.forEach((i) => {
       if (i.timeLeft === "") {
         i.originDate = this.getCurrentTimeNumber();
       }
-    })
+    });
   }
 
   toggleNew() {
@@ -225,7 +245,8 @@ export class Tab1Page implements OnInit {
       countdown: this.newCountdown,
       originDate: this.getCurrentTimeNumber() - 300000000,
       setsDone: 0,
-      timeLeft: this.newCountdown.toString(),
+      timeLeft: this.newCountdown ? this.newCountdown.toString() : null,
+      notes: this.newNotes,
     });
 
     const toast = await this.toastController.create({
@@ -247,6 +268,35 @@ export class Tab1Page implements OnInit {
     this.newCountdown = null;
   }
 
+  async deleteWorkout() {
+    const alert = await this.alertController.create({
+      cssClass: "my-custom-class",
+      header: "Confirm",
+      message: `Are you sure you want to delete ${this.nameOfEditItem}?`,
+      buttons: [
+        {
+          text: "Cancel",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: (blah) => {},
+        },
+        {
+          text: "Yes",
+          handler: () => {
+            console.log("Confirm Okay");
+            this.workoutNames = this.workoutNames.filter(
+              (i) => i.name !== this.nameOfEditItem
+            );
+            this.inEdit = false;
+            this.newActive = false;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
   radioChange(e) {
     this.useMetric = e.target.value;
   }
@@ -261,12 +311,14 @@ export class Tab1Page implements OnInit {
       this.newReps = match.reps;
       this.newWeight = match.weight.replace(/\D/g, "");
 
-      const grabType = match.weight.match(/[a-zA-Z]+/g);
+      if (match.weight) {
+        const grabType = match.weight.match(/[a-zA-Z]+/g);
 
-      if (grabType[0] === "kg") {
-        this.useMetric = "true";
-      } else {
-        this.useMetric = "false";
+        if (grabType[0] === "kg") {
+          this.useMetric = "true";
+        } else {
+          this.useMetric = "false";
+        }
       }
       this.newCountdown = match.countdown;
     }

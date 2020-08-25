@@ -1,3 +1,4 @@
+import { Insomnia } from '@ionic-native/insomnia/ngx';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -15,6 +16,7 @@ import { Tab1PageRoutingModule } from './tab1-routing.module';
     ExploreContainerComponentModule,
     Tab1PageRoutingModule
   ],
+  providers: [Insomnia],
   declarations: [Tab1Page]
 })
 export class Tab1PageModule {}
