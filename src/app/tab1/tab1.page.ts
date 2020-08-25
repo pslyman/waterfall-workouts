@@ -38,7 +38,7 @@ interface workoutsInt {
       trigger("cardIn", [
         transition(":enter", [
           style({ transform: "scale(1.2)", top: "75px" }),
-          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 }))
+          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 })),
         ]),
       ]),
     ],
@@ -46,28 +46,14 @@ interface workoutsInt {
       trigger("headerSlide", [
         transition(":enter", [
           style({ transform: "scale(1.2)", top: "-75px" }),
-          animate("1s ease-out", style({ transform: "scale(1)", top: 0 }))
+          animate("1s ease-out", style({ transform: "scale(1)", top: 0 })),
         ]),
       ]),
     ],
   ],
 })
 export class Tab1Page implements OnInit {
-  workoutNames: workoutsInt[] = [
-    /* {
-      days: 3,
-      name: "Squats",
-      sets: 3,
-      reps: 8,
-      weight: "10lbs",
-      countdown: 10,
-      originDate: 1598248800000 - 100000000,
-      setsDone: 0,
-      timeLeft: ".1",
-      notes:
-        "It's like you're sitting in a chair, but there's actually no chair.",
-    }, */
-  ];
+  workoutNames: workoutsInt[] = [];
 
   newName = "";
   newDays = null;
