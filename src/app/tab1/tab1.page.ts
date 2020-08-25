@@ -114,7 +114,6 @@ export class Tab1Page implements OnInit {
 
     if (!!match) {
       if (match.timeLeft) {
-        console.log(match.timeLeft);
         let hms = match.timeLeft; // your input string
 
         if (hms.includes(":")) {
@@ -155,7 +154,6 @@ export class Tab1Page implements OnInit {
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       let seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      console.log(distance);
       if (distance > 0) {
         document.getElementById(
           "timerHTML"
