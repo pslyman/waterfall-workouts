@@ -91,6 +91,92 @@ export class Tab1Page implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleLightContent();
     });
+
+    this.loadTheme();
+  }
+
+  toggleMoonlight() {
+    var element = document.getElementById("body-theme");
+    element.classList.remove("light");
+    element.classList.remove("dark");
+    element.classList.remove("amoled");
+
+    this.storage.get("theme").then((value) => {
+      if (value === "light") {
+        element.classList.add("dark");
+
+        this.storage.set("theme", "dark");
+      } else {
+        this.storage.set("theme", "light");
+      };
+
+      if (this.platform.is("android")) {
+        if (value === "dark") {
+          this.statusBar.backgroundColorByHexString("#ffffff");
+          this.statusBar.styleDefault();
+          return;
+        }
+        if (value === "light") {
+          this.statusBar.backgroundColorByHexString("#1f1f1f");
+          this.statusBar.styleLightContent();
+          return;
+        }
+      }
+    });
+ 
+  }
+
+  loadTheme() {
+    this.storage.get("theme").then((value) => {
+      if (value) {
+        var element = document.getElementById("body-theme");
+
+        element.classList.add(value);
+
+        if (this.platform.is("android")) {
+          if (value === "light") {
+            this.statusBar.backgroundColorByHexString("#ffffff");
+            this.statusBar.styleDefault();
+            return;
+          }
+          if (value === "dark") {
+            this.statusBar.backgroundColorByHexString("#1f1f1f");
+            this.statusBar.styleLightContent();
+            return;
+          }
+
+          return;
+        }
+      } else {
+        this.storage.set("theme", "light");
+        var element = document.getElementById("body-theme");
+
+        if (this.platform.is("android")) {
+          this.statusBar.backgroundColorByHexString("#ffffff");
+          this.statusBar.styleDefault();
+          return;
+        }
+      }
+    });
+  }
+
+
+
+  colorValueChange(value) {
+    if (this.platform.is("android")) {
+      if (value === "light") {
+        this.statusBar.backgroundColorByHexString("#ffffff");
+        this.statusBar.styleDefault();
+        return;
+      }
+      if (value === "dark") {
+        this.statusBar.backgroundColorByHexString("#121212");
+        this.statusBar.styleLightContent();
+        return;
+      }
+     
+      return;
+    }
   }
 
   getStorage() {
@@ -289,6 +375,7 @@ export class Tab1Page implements OnInit {
   async toggleNew() {
     this.saveToStorage();
     this.newActive = !this.newActive;
+    this.clearAddWorkout();
   }
 
   async addNewWorkout() {

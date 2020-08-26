@@ -3,16 +3,16 @@
     <ion-title> OpenFit </ion-title>
 
     <ion-buttons slot="primary">
+      <ion-button class="grey-off" (click)="toggleMoonlight()">
+        <ion-icon slot="icon-only" name="moon"></ion-icon>
+      </ion-button>
       <ion-button
+        *ngIf="!inEdit && !timerActive"
         color="primary"
         (click)="toggleNew()"
         [ngClass]="{'grey-off': !newActive}"
       >
-        <ion-icon
-          *ngIf="!inEdit && !timerActive"
-          slot="icon-only"
-          name="add-circle"
-        ></ion-icon>
+        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
