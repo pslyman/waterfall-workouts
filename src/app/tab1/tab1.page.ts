@@ -1,9 +1,10 @@
 import { trigger, style, animate, transition } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
-import { ToastController } from "@ionic/angular";
+import { ToastController, Platform } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
 import { Insomnia } from "@ionic-native/insomnia/ngx";
 import { Storage } from "@ionic/storage";
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 interface workoutsInt {
   days: number;
@@ -80,11 +81,16 @@ export class Tab1Page implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     private insomnia: Insomnia,
-    private storage: Storage
+    private storage: Storage,
+    private statusBar: StatusBar,
+    private platform: Platform
   ) {}
 
   ngOnInit() {
     this.getStorage();
+    this.platform.ready().then(() => {
+      this.statusBar.styleLightContent();
+    });
   }
 
   getStorage() {
@@ -249,8 +255,14 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  toggleNew() {
+  async toggleNew() {
     this.newActive = !this.newActive;
+
+    const toast = await this.toastController.create({
+      message: `${this.newActive}`,
+      duration: 2000,
+    });
+    toast.present();
   }
 
   async addNewWorkout() {

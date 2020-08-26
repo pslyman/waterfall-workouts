@@ -27,6 +27,10 @@
     </ion-toolbar>
   </ion-header>
 
+  <h3 style="text-align: center;" *ngIf="!workoutNames">
+    Click the + button to add a workout
+  </h3>
+
   <ion-card *ngFor="let item of workoutNames" [@cardIn]>
     <ion-card-content class="card-flex">
       <div class="max-width-content">
@@ -154,7 +158,6 @@
           placeholder="Max number of days to pass between"
         ></ion-input>
       </ion-item>
-      <ion-item><p class="required-text">*required</p></ion-item>
     </ion-card>
     <ion-card>
       <ion-item>
@@ -164,6 +167,7 @@
           [(ngModel)]="newNotes"
         ></ion-input>
       </ion-item>
+      <ion-item><p class="required-text">*required</p></ion-item>
     </ion-card>
     <ion-card class="add-workout-bton-container">
       <ion-button color="danger" (click)="deleteWorkout()" *ngIf="inEdit"
@@ -190,7 +194,7 @@
 
   <div class="new-add-modal" *ngIf="timerActive" [@inOutAnimation]>
     <ion-card>
-      <h1 id="timerHTML">GO!<br>--:--:--</h1>
+      <h1 id="timerHTML">GO!<br />--:--:--</h1>
     </ion-card>
 
     <ion-card class="add-workout-bton-container">
