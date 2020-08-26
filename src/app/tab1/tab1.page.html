@@ -48,7 +48,7 @@
             >
           </p>
           <p
-            [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) === 1)}"
+            [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) <= 1)}"
           >
             Days since: {{getDifferenceBetweenTimes(item.originDate)}}
             ({{item.days}} max)
