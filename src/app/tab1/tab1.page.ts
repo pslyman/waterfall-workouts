@@ -4,7 +4,7 @@ import { ToastController, Platform } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
 import { Insomnia } from "@ionic-native/insomnia/ngx";
 import { Storage } from "@ionic/storage";
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 interface workoutsInt {
   days: number;
@@ -99,6 +99,30 @@ export class Tab1Page implements OnInit {
     });
   }
 
+  saveToStorage() {
+    this.sortWorkouts();
+    this.storage.set("workouts", JSON.stringify(this.workoutNames));
+  }
+
+  sortWorkouts() {
+    this.workoutNames.sort((a, b) =>
+      (this.getDifferenceBetweenTimes(a.originDate) === 0)
+        .toString()
+        .localeCompare(
+          (this.getDifferenceBetweenTimes(a.originDate) === 0).toString()
+        )
+    );
+
+    this.workoutNames.sort((a, b) =>
+      (a.days / this.getDifferenceBetweenTimes(a.originDate))
+        .toString()
+        .localeCompare(
+          (b.days / this.getDifferenceBetweenTimes(b.originDate)).toString()
+        )
+    );
+
+  }
+
   getCurrentTimeNumber() {
     let d = new Date();
     let year = d.getFullYear();
@@ -124,6 +148,8 @@ export class Tab1Page implements OnInit {
     if (!!match) {
       match.originDate = this.getCurrentTimeNumber();
     }
+
+    this.saveToStorage();
   }
 
   itemRestart(name: string) {
@@ -133,6 +159,7 @@ export class Tab1Page implements OnInit {
       match.originDate = this.getCurrentTimeNumber() - 100000000;
       match.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
     }
+    this.saveToStorage();
   }
 
   itemSetSubtraction(name: string) {
@@ -253,16 +280,12 @@ export class Tab1Page implements OnInit {
         i.originDate = this.getCurrentTimeNumber();
       }
     });
+    this.saveToStorage();
   }
 
   async toggleNew() {
+    this.saveToStorage();
     this.newActive = !this.newActive;
-
-    const toast = await this.toastController.create({
-      message: `${this.newActive}`,
-      duration: 2000,
-    });
-    toast.present();
   }
 
   async addNewWorkout() {
@@ -292,8 +315,6 @@ export class Tab1Page implements OnInit {
       this.newDays = 3;
     }
 
-    console.log(this.workoutNames);
-
     this.workoutNames = this.workoutNames || [];
 
     this.workoutNames.push({
@@ -318,10 +339,6 @@ export class Tab1Page implements OnInit {
     toast.present();
 
     this.clearAddWorkout();
-  }
-
-  saveToStorage() {
-    this.storage.set("workouts", JSON.stringify(this.workoutNames));
   }
 
   clearAddWorkout() {
@@ -349,7 +366,6 @@ export class Tab1Page implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            console.log("Confirm Okay");
             this.workoutNames = this.workoutNames.filter(
               (i) => i.name !== this.nameOfEditItem
             );

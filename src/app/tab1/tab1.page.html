@@ -1,8 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar [@cardIn]>
-    <ion-title>
-      OpenFit
-    </ion-title>
+    <ion-title> OpenFit </ion-title>
 
     <ion-buttons slot="primary">
       <ion-button
@@ -27,9 +25,11 @@
     </ion-toolbar>
   </ion-header>
 
-  <h3 style="text-align: center;" *ngIf="!workoutNames">
-    Click the + button to add a workout
-  </h3>
+  <ion-card [@cardIn]>
+    <ion-card-content style="text-align: center" *ngIf="!workoutNames">
+      <h2>Click the + button to add a workout</h2>
+    </ion-card-content>
+  </ion-card>
 
   <ion-card *ngFor="let item of workoutNames" [@cardIn]>
     <ion-card-content class="card-flex">
@@ -47,7 +47,9 @@
               ({{ item.timeLeft }} left)</span
             >
           </p>
-          <p>
+          <p
+            [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) === 1)}"
+          >
             Days since: {{getDifferenceBetweenTimes(item.originDate)}}
             ({{item.days}} max)
           </p>
