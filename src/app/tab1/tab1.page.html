@@ -25,8 +25,8 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card [@cardIn]>
-    <ion-card-content style="text-align: center" *ngIf="!workoutNames">
+  <ion-card [@cardIn] *ngIf="workoutNames.length === 0">
+    <ion-card-content style="text-align: center">
       <h2>Click the + button to add a workout</h2>
     </ion-card-content>
   </ion-card>

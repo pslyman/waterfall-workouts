@@ -95,7 +95,11 @@ export class Tab1Page implements OnInit {
 
   getStorage() {
     this.storage.get("workouts").then((list) => {
-      this.workoutNames = JSON.parse(list);
+      if (list) {
+        this.workoutNames = JSON.parse(list);
+      } else {
+        this.workoutNames = [];
+      }
     });
   }
 
@@ -120,7 +124,6 @@ export class Tab1Page implements OnInit {
           (b.days / this.getDifferenceBetweenTimes(b.originDate)).toString()
         )
     );
-
   }
 
   getCurrentTimeNumber() {
@@ -324,7 +327,7 @@ export class Tab1Page implements OnInit {
       reps: this.newReps,
       weight: `${this.newWeight}`,
       countdown: this.newCountdown,
-      originDate: this.getCurrentTimeNumber() - 300000000,
+      originDate: this.getCurrentTimeNumber() - 100000000,
       setsDone: 0,
       timeLeft: this.newCountdown ? this.newCountdown.toString() : null,
       notes: this.newNotes,
