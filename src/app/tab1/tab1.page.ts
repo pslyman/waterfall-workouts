@@ -1,4 +1,10 @@
-import { trigger, style, animate, transition } from "@angular/animations";
+import {
+  trigger,
+  style,
+  animate,
+  transition,
+  keyframes,
+} from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { ToastController, Platform } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
@@ -26,8 +32,14 @@ interface workoutsInt {
   animations: [
     trigger("inOutAnimation", [
       transition(":enter", [
-        style({ bottom: "200%" }),
-        animate(".5s ease-out", style({ bottom: "0" })),
+        animate(
+          ".7s ease-in-out",
+          keyframes([
+            style({ bottom: "100%", offset: 0 }),
+
+            style({ bottom: 0, offset: 1 }),
+          ])
+        ),
       ]),
       transition(":leave", [
         style({ bottom: 0 }),
@@ -38,8 +50,15 @@ interface workoutsInt {
     [
       trigger("cardIn", [
         transition(":enter", [
-          style({ transform: "scale(1.2)", top: "75px" }),
+          style({ transform: "scale(.8)", top: "75px" }),
           animate(".5s ease-out", style({ transform: "scale(1)", top: 0 })),
+        ]),
+        transition(":leave", [
+          style({ transform: "scale(1)", top: 0, opacity: 1 }),
+          animate(
+            ".2s ease-out",
+            style({ transform: "scale(.8)", top: "75px", opacity: 0 })
+          ),
         ]),
       ]),
     ],
@@ -47,7 +66,7 @@ interface workoutsInt {
       trigger("headerSlide", [
         transition(":enter", [
           style({ transform: "scale(1.2)", top: "-75px" }),
-          animate("1s ease-out", style({ transform: "scale(1)", top: 0 })),
+          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 })),
         ]),
       ]),
     ],
@@ -108,7 +127,7 @@ export class Tab1Page implements OnInit {
         this.storage.set("theme", "dark");
       } else {
         this.storage.set("theme", "light");
-      };
+      }
 
       if (this.platform.is("android")) {
         if (value === "dark") {
@@ -123,7 +142,6 @@ export class Tab1Page implements OnInit {
         }
       }
     });
- 
   }
 
   loadTheme() {
@@ -160,8 +178,6 @@ export class Tab1Page implements OnInit {
     });
   }
 
-
-
   colorValueChange(value) {
     if (this.platform.is("android")) {
       if (value === "light") {
@@ -174,7 +190,7 @@ export class Tab1Page implements OnInit {
         this.statusBar.styleLightContent();
         return;
       }
-     
+
       return;
     }
   }
@@ -439,6 +455,7 @@ export class Tab1Page implements OnInit {
     this.newWeight = "";
     this.newWeightType = "";
     this.newCountdown = null;
+    this.newNotes = "";
   }
 
   async deleteWorkout() {
@@ -495,6 +512,7 @@ export class Tab1Page implements OnInit {
         }
       }
       this.newCountdown = match.countdown;
+      this.newNotes = match.notes;
     }
     this.nameOfEditItem = itemName;
     this.inEdit = true;
@@ -508,16 +526,6 @@ export class Tab1Page implements OnInit {
   }
 
   async saveChanges() {
-    if (this.workoutNames.some((i) => i.name === this.newName)) {
-      const toast = await this.toastController.create({
-        message: `"${this.newName}" already exists`,
-        duration: 2000,
-      });
-      toast.present();
-
-      return;
-    }
-
     if (this.newWeight) {
       if (this.useMetric) {
         this.newWeightType = "kg";
@@ -537,6 +545,7 @@ export class Tab1Page implements OnInit {
       match.reps = this.newReps;
       match.weight = `${this.newWeight}`;
       match.countdown = this.newCountdown;
+      match.notes = this.newNotes;
     }
 
     this.saveToStorage();

@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar [@cardIn]>
+  <ion-toolbar [@headerSlide]>
     <ion-title> OpenFit </ion-title>
 
     <ion-buttons slot="primary">
@@ -25,71 +25,75 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card [@cardIn] *ngIf="workoutNames.length === 0">
+  <ion-card *ngIf="workoutNames.length === 0" [@cardIn] >
     <ion-card-content style="text-align: center">
       <h2>Click the + button to add a workout</h2>
     </ion-card-content>
   </ion-card>
 
-  <ion-card *ngFor="let item of workoutNames" [@cardIn]>
-    <ion-card-content class="card-flex">
-      <div class="max-width-content">
-        <h1 class="card-header">{{item.name}}</h1>
-        <div *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0">
-          <p *ngIf="item.sets || item.reps">
-            <span *ngIf="item.sets">Sets: {{item.sets - item.setsDone}}</span
-            ><span *ngIf="item.sets && item.reps"> | </span
-            ><span *ngIf="item.reps">Reps: {{item.reps}}</span>
-          </p>
-          <p *ngIf="item.weight">Weight: {{item.weight}}</p>
-          <p *ngIf="item.countdown">
-            Time: {{item.countdown}} minutes<span>
-              ({{ item.timeLeft }} left)</span
+  <div *ngIf="!newActive" [@cardIn]>
+    <ion-card *ngFor="let item of workoutNames" >
+      <ion-card-content class="card-flex">
+        <div class="max-width-content">
+          <h1 class="card-header">{{item.name}}</h1>
+          <div *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0">
+            <p *ngIf="item.sets || item.reps">
+              <span *ngIf="item.sets">Sets: {{item.sets - item.setsDone}}</span
+              ><span *ngIf="item.sets && item.reps"> | </span
+              ><span *ngIf="item.reps">Reps: {{item.reps}}</span>
+            </p>
+            <p *ngIf="item.weight">Weight: {{item.weight}}</p>
+            <p *ngIf="item.countdown">
+              Time: {{item.countdown}} minutes<span>
+                ({{ item.timeLeft }} left)</span
+              >
+            </p>
+            <p
+              [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) <= 1)}"
             >
-          </p>
-          <p
-            [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) <= 1)}"
-          >
-            Days since: {{getDifferenceBetweenTimes(item.originDate)}}
-            ({{item.days}} max)
-          </p>
+              Days since: {{getDifferenceBetweenTimes(item.originDate)}}
+              ({{item.days}} max)
+            </p>
 
-          <p *ngIf="item.notes" class="item-notes">{{ item.notes }}</p>
+            <p *ngIf="item.notes" >{{ item.notes }}</p>
+          </div>
         </div>
-      </div>
-      <div
-        class="vertical-buttons"
-        *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0"
-      >
-        <ion-button (click)="itemDone(item.name)">Done</ion-button>
-        <div *ngIf="item.reps">
-          <ion-button color="dark" (click)="itemSetSubtraction(item.name)"
-            >-</ion-button
-          ><ion-button
+        <div
+          class="vertical-buttons"
+          *ngIf="getDifferenceBetweenTimes(item.originDate) !== 0"
+        >
+          <ion-button (click)="itemDone(item.name)">Done</ion-button>
+          <div *ngIf="item.reps">
+            <ion-button color="dark" (click)="itemSetSubtraction(item.name)"
+              >-</ion-button
+            ><ion-button
+              color="dark"
+              (click)="itemSetAddition(item.name)"
+              [disabled]="item.setsDone === 0"
+              >+</ion-button
+            >
+          </div>
+          <ion-button
             color="dark"
-            (click)="itemSetAddition(item.name)"
-            [disabled]="item.setsDone === 0"
-            >+</ion-button
+            *ngIf="item.countdown"
+            (click)="beginTimer(item.name)"
+            >Timer</ion-button
+          >
+          <ion-button color="dark" (click)="editItem(item.name)"
+            >Edit</ion-button
           >
         </div>
-        <ion-button
-          color="dark"
-          *ngIf="item.countdown"
-          (click)="beginTimer(item.name)"
-          >Timer</ion-button
+        <div
+          class="vertical-buttons"
+          *ngIf="getDifferenceBetweenTimes(item.originDate) === 0"
         >
-        <ion-button color="dark" (click)="editItem(item.name)">Edit</ion-button>
-      </div>
-      <div
-        class="vertical-buttons"
-        *ngIf="getDifferenceBetweenTimes(item.originDate) === 0"
-      >
-        <ion-button color="dark" (click)="itemRestart(item.name)"
-          >Restart</ion-button
-        >
-      </div>
-    </ion-card-content>
-  </ion-card>
+          <ion-button color="dark" (click)="itemRestart(item.name)"
+            >Restart</ion-button
+          >
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
   <div class="new-add-modal" *ngIf="newActive" [@inOutAnimation]>
     <ion-card>
