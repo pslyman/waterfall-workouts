@@ -79,7 +79,7 @@
       },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-cloud-settings": {
-        "ANDROID_BACKUP_SERVICE_KEY": "AIzaSyCEGOSiTXae0xjMh1WktK-6NWLMsVY-jow"
+        "ANDROID_BACKUP_SERVICE_KEY": ""
       }
     },
     "platforms": [
