@@ -25,13 +25,13 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card *ngIf="workoutNames.length === 0" [@cardIn] >
+  <ion-card *ngIf="workoutNames.length === 0" [@helpCardIn] style="height: 50px">
     <ion-card-content style="text-align: center">
       <h2>Click the + button to add a workout</h2>
     </ion-card-content>
   </ion-card>
 
-  <div *ngIf="!newActive" [@cardIn]>
+  <div *ngIf="!newActive && !timerActive" [@cardIn]>
     <ion-card *ngFor="let item of workoutNames" >
       <ion-card-content class="card-flex">
         <div class="max-width-content">

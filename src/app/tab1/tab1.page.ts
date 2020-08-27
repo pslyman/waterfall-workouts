@@ -63,6 +63,14 @@ interface workoutsInt {
       ]),
     ],
     [
+      trigger("helpCardIn", [
+        transition(":enter", [
+          style({ height: "0" }),
+          animate(".5s ease-out", style({height: "50px" })),
+        ]),
+      ]),
+    ],
+    [
       trigger("headerSlide", [
         transition(":enter", [
           style({ transform: "scale(1.2)", top: "-75px" }),
