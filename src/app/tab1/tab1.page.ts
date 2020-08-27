@@ -11,6 +11,7 @@ import { AlertController } from "@ionic/angular";
 import { Insomnia } from "@ionic-native/insomnia/ngx";
 import { Storage } from "@ionic/storage";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
+import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
 
 interface workoutsInt {
   days: number;
@@ -66,7 +67,7 @@ interface workoutsInt {
       trigger("helpCardIn", [
         transition(":enter", [
           style({ height: "0" }),
-          animate(".5s ease-out", style({height: "50px" })),
+          animate(".5s ease-out", style({ height: "50px" })),
         ]),
       ]),
     ],
@@ -110,7 +111,8 @@ export class Tab1Page implements OnInit {
     private insomnia: Insomnia,
     private storage: Storage,
     private statusBar: StatusBar,
-    private platform: Platform
+    private platform: Platform,
+    private cloudSettings: CloudSettings
   ) {}
 
   ngOnInit() {
@@ -123,6 +125,7 @@ export class Tab1Page implements OnInit {
   }
 
   toggleMoonlight() {
+    this.getStorage();
     var element = document.getElementById("body-theme");
     element.classList.remove("light");
     element.classList.remove("dark");
@@ -209,6 +212,22 @@ export class Tab1Page implements OnInit {
         this.workoutNames = JSON.parse(list);
       } else {
         this.workoutNames = [];
+
+        this.cloudSettings.exists().then(async (exists: boolean) => {
+          if (exists) {
+            this.cloudSettings
+              .load()
+              .then(async (backedUpWorkouts: any) => {
+                if (backedUpWorkouts) {
+                  this.workoutNames =
+                    backedUpWorkouts[Object.keys(backedUpWorkouts)[0]];
+                }
+              })
+              .catch((error: any) => {
+                alert(error);
+              });
+          }
+        });
       }
     });
   }
@@ -216,6 +235,15 @@ export class Tab1Page implements OnInit {
   saveToStorage() {
     this.sortWorkouts();
     this.storage.set("workouts", JSON.stringify(this.workoutNames));
+    this.cloudSettings.save("");
+
+    let temporaryObject = { savedWorkouts: this.workoutNames };
+    this.cloudSettings
+      .save(temporaryObject)
+      .then(async (response: any) => {})
+      .catch((error: any) => {
+        alert(error);
+      });
   }
 
   sortWorkouts() {
