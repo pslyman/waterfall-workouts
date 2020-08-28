@@ -12,6 +12,8 @@ import { Insomnia } from "@ionic-native/insomnia/ngx";
 import { Storage } from "@ionic/storage";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
+import { Vibration } from "@ionic-native/vibration/ngx";
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 interface workoutsInt {
   days: number;
@@ -112,7 +114,9 @@ export class Tab1Page implements OnInit {
     private storage: Storage,
     private statusBar: StatusBar,
     private platform: Platform,
-    private cloudSettings: CloudSettings
+    private cloudSettings: CloudSettings,
+    private vibration: Vibration,
+    private localNotifications: LocalNotifications
   ) {}
 
   ngOnInit() {
@@ -242,7 +246,7 @@ export class Tab1Page implements OnInit {
       .save(temporaryObject)
       .then(async (response: any) => {})
       .catch((error: any) => {
-        alert(error);
+        /*  alert(error); */
       });
   }
 
@@ -358,7 +362,7 @@ export class Tab1Page implements OnInit {
       }
     }
 
-    let audio = new Audio("../../assets/alarmSound.mp3");
+    let audio = new Audio("../../assets/newAlarmSound.mp3");
 
     // Set the date we're counting down to
     let countDownDate = new Date(
@@ -366,7 +370,7 @@ export class Tab1Page implements OnInit {
     ).getTime();
 
     // Update the count down every 1 second
-    this.thatTimerThing = setInterval(function () {
+    this.thatTimerThing = setInterval(() => {
       // Get today's date and time
       let now = new Date().getTime();
 
@@ -384,28 +388,46 @@ export class Tab1Page implements OnInit {
       if (distance > 0) {
         document.getElementById(
           "timerHTML"
-        ).innerHTML = `${itemName} timer <br /> ${hours}:${minutes}:${seconds}`;
+        ).innerHTML = `${itemName}<br /> ${hours}:${minutes}:${seconds}`;
       }
-      if (!this.timerActive) {
-        if (!!match) {
-          if (
-            (!hours || hours < 0) &&
-            (!minutes || minutes < 0) &&
-            (!seconds || seconds < 0)
-          ) {
-            match.timeLeft = "";
-          } else {
-            match.timeLeft = `${hours}:${minutes}:${seconds}`;
-          }
+
+      if (!!match) {
+        if (
+          (!hours || hours < 0) &&
+          (!minutes || minutes < 0) &&
+          (!seconds || seconds < 0)
+        ) {
+          match.timeLeft = "";
+        } else {
+          match.timeLeft = `${hours}:${minutes}:${seconds}`;
         }
       }
+
       if (distance < 0) {
         document.getElementById(
           "timerHTML"
-        ).innerHTML = `${itemName} timer <br /> Time's up!`;
+        ).innerHTML = `${itemName}<br /> Time's up!`;
         audio.play();
+          this.timeDone(itemName);
+
+        clearInterval(this.thatTimerThing);
       }
     }, 1000);
+  }
+
+  timeDone(name: string) {
+    this.vibration.vibrate(1500);
+
+    this.localNotifications.schedule({
+      title: `Time's up!`,
+      text: `Your timer for ${name} has ended.`,
+      foreground: true,
+      silent: false,
+      priority: 2,
+      icon: "res://notificationicon.png",
+      smallIcon:"res://notificationicon.png"
+
+  });
   }
 
   stopTimer() {

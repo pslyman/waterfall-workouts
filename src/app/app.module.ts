@@ -11,6 +11,9 @@ import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
+import { Vibration } from '@ionic-native/vibration/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,6 +28,8 @@ import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
     StatusBar,
     SplashScreen,
     CloudSettings,
+    Vibration,
+    LocalNotifications,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],
