@@ -1,5 +1,5 @@
 {
-  "name": "OpenFit",
+  "name": "OpenLift",
   "version": "0.0.1",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
@@ -84,7 +84,7 @@
       },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-cloud-settings": {
-        "ANDROID_BACKUP_SERVICE_KEY": ""
+        "ANDROID_BACKUP_SERVICE_KEY": "AIzaSyBUAwnjb3YbRXElWeyDMbXUmwin3s5HbrA"
       },
       "cordova-plugin-vibration": {},
       "cordova-plugin-local-notification": {}

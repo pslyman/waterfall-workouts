@@ -1,1 +1,1 @@
-# OpenFit
+# OpenLift
