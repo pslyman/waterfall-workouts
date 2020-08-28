@@ -424,7 +424,6 @@ export class Tab1Page implements OnInit {
       foreground: true,
       silent: false,
       priority: 2,
-      icon: "res://notificationicon.png",
       smallIcon:"res://notificationicon.png"
 
   });
