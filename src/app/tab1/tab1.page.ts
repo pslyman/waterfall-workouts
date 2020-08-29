@@ -366,7 +366,7 @@ export class Tab1Page implements OnInit {
 
     // Set the date we're counting down to
     let countDownDate = new Date(
-      new Date().valueOf() + Number(timerAmount) * 60100
+      new Date().valueOf() + Number(timerAmount) * 60000
     ).getTime();
 
     // Update the count down every 1 second
