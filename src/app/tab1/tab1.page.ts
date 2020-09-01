@@ -13,7 +13,7 @@ import { Storage } from "@ionic/storage";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
 import { Vibration } from "@ionic-native/vibration/ngx";
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications } from "@ionic-native/local-notifications/ngx";
 
 interface workoutsInt {
   days: number;
@@ -124,7 +124,13 @@ export class Tab1Page implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleLightContent();
     });
-
+    this.storage.get("useMetricDefault").then((value) => {
+      if (value) {
+      this.useMetric = value;
+      } else {
+        this.storage.set("useMetricDefault", "true");
+      }
+    });
     this.loadTheme();
   }
 
@@ -408,7 +414,7 @@ export class Tab1Page implements OnInit {
           "timerHTML"
         ).innerHTML = `${itemName}<br /> Time's up!`;
         audio.play();
-          this.timeDone(itemName);
+        this.timeDone(itemName);
 
         clearInterval(this.thatTimerThing);
       }
@@ -424,9 +430,8 @@ export class Tab1Page implements OnInit {
       foreground: true,
       silent: false,
       priority: 2,
-      smallIcon:"res://notificationicon.png"
-
-  });
+      smallIcon: "res://notificationicon.png",
+    });
   }
 
   stopTimer() {
@@ -464,11 +469,14 @@ export class Tab1Page implements OnInit {
       }
     }
 
+    this.storage.get("useMetricDefault").then((value) => {
+      this.useMetric = value;
+    });
     if (this.newWeight) {
-      if (this.useMetric) {
+      if (this.useMetric === "true") {
         this.newWeightType = "kg";
         this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      } else {
+      } else if (this.useMetric === "false") {
         this.newWeightType = "lbs";
         this.newWeight = `${this.newWeight}${this.newWeightType}`;
       }
@@ -547,11 +555,14 @@ export class Tab1Page implements OnInit {
 
   radioChange(e) {
     this.useMetric = e.target.value;
+    this.storage.set("useMetricDefault", e.target.value);
   }
 
   editItem(itemName) {
     let match = this.workoutNames.find((i) => i.name === itemName);
-
+    this.storage.get("useMetricDefault").then((value) => {
+      this.useMetric = value;
+    });
     if (!!match) {
       this.newName = match.name;
       this.newDays = match.days;
@@ -583,11 +594,14 @@ export class Tab1Page implements OnInit {
   }
 
   async saveChanges() {
+    this.storage.get("useMetricDefault").then((value) => {
+      this.useMetric = value;
+    });
     if (this.newWeight) {
-      if (this.useMetric) {
+      if (this.useMetric === "true") {
         this.newWeightType = "kg";
         this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      } else {
+      } else if (this.useMetric === "false") {
         this.newWeightType = "lbs";
         this.newWeight = `${this.newWeight}${this.newWeightType}`;
       }
