@@ -569,6 +569,7 @@ export class Tab1Page implements OnInit {
     toast.present();
 
     this.clearAddWorkout();
+    this.newActive = !this.newActive;
   }
 
   clearAddWorkout() {
