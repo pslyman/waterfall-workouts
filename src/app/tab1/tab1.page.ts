@@ -4,6 +4,8 @@ import {
   animate,
   transition,
   keyframes,
+  query,
+  stagger,
 } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { ToastController, Platform } from "@ionic/angular";
@@ -36,17 +38,16 @@ interface workoutsInt {
     trigger("inOutAnimation", [
       transition(":enter", [
         animate(
-          ".7s ease-in-out",
+          ".5s ease-out",
           keyframes([
-            style({ bottom: "100%", offset: 0 }),
-
-            style({ bottom: 0, offset: 1 }),
+            style({
+              opacity: 0,
+              transform: "translateY(-10px)",
+              offset: 0,
+            }),
+            style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
           ])
         ),
-      ]),
-      transition(":leave", [
-        style({ bottom: 0 }),
-        animate(".5s ease-in", style({ bottom: "200%" })),
       ]),
     ]),
 
@@ -74,10 +75,64 @@ interface workoutsInt {
       ]),
     ],
     [
-      trigger("headerSlide", [
-        transition(":enter", [
-          style({ transform: "scale(1.2)", top: "-75px" }),
-          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 })),
+      // Trigger animation cards array
+      trigger("cardAnimation", [
+        // Transition from any state to any state
+        transition("* => *", [
+          // Initially the all cards are not visible
+          query(":enter", style({ opacity: 0 }), { optional: true }),
+
+          // Each card will appear sequentially with the delay of 300ms
+          query(
+            ":enter",
+            stagger("45ms", [
+              animate(
+                ".5s ease-in",
+                keyframes([
+                  style({
+                    opacity: 0,
+                    transform: "translateY(-10px) scale(1.05)",
+                    offset: 0,
+                  }),
+                  style({
+                    opacity: 0.5,
+                    transform: "translateY(-5px) scale(1)",
+                    offset: 0.3,
+                  }),
+                  style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
+                ])
+              ),
+            ]),
+            { optional: true }
+          ),
+
+          // Cards will disappear sequentially with the delay of 300ms
+          query(
+            ":leave",
+            stagger("6ms", [
+              animate(
+                "150ms ease-out",
+                keyframes([
+                  style({
+                    opacity: 1,
+                    transform: "translateY(0px)",
+                    offset: 0,
+                  }),
+                  style({
+                    opacity: 0.5,
+                    transform: "translateY(5px)",
+                    offset: 0.3,
+                  }),
+                  style({
+                    opacity: 0,
+                    transform: "translateY(10px) scale(.995)",
+                    offset: 1,
+                  }),
+                ])
+              ),
+            ]),
+            { optional: true }
+          ),
         ]),
       ]),
     ],
@@ -126,7 +181,7 @@ export class Tab1Page implements OnInit {
     });
     this.storage.get("useMetricDefault").then((value) => {
       if (value) {
-      this.useMetric = value;
+        this.useMetric = value;
       } else {
         this.storage.set("useMetricDefault", "true");
       }
@@ -307,6 +362,7 @@ export class Tab1Page implements OnInit {
     let match = this.workoutNames.find((i) => i.name === name);
 
     if (!!match) {
+      match.setsDone = 0;
       match.originDate = this.getCurrentTimeNumber() - 100000000;
       match.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
     }
@@ -443,8 +499,20 @@ export class Tab1Page implements OnInit {
     clearInterval(this.thatTimerThing);
 
     this.workoutNames.forEach((i) => {
-      if (i.timeLeft === "") {
-        i.originDate = this.getCurrentTimeNumber();
+      if (i.sets && i.timeLeft === "") {
+        if (i.setsDone === i.sets - 1) {
+          i.setsDone = i.sets;
+          i.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
+          i.originDate = this.getCurrentTimeNumber();
+        } else if (i.setsDone < i.sets - 1) {
+          i.setsDone++;
+          i.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
+        }
+      } else {
+        if (i.timeLeft === "") {
+          i.originDate = this.getCurrentTimeNumber();
+          i.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
+        }
       }
     });
     this.saveToStorage();

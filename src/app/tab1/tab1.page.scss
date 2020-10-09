@@ -15,7 +15,7 @@
 }
 
 .new-add-modal {
-  position: absolute;
+  position: static;
   z-index: 90;
   width: 100%;
   height: calc(100% - 56px);
@@ -54,5 +54,5 @@ ion-header{
 }
 
 .late-text {
-  color: red;
+  color: #da5a5a;
 }
