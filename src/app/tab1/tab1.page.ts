@@ -69,8 +69,20 @@ interface workoutsInt {
     [
       trigger("helpCardIn", [
         transition(":enter", [
-          style({ height: "0" }),
-          animate(".5s ease-out", style({ height: "50px" })),
+          style({ transform: "scale(.8)", height: "0", opacity: 0 }),
+          animate(".5s ease-out", style({ transform: "scale(1)", height: "50px", opacity: 1 })),
+        ]),
+        transition(":leave", [
+          style({ height: "50px", opacity: 1 }),
+          animate(
+            ".5s ease-out",
+            style({
+              transform: "scale(.8)",
+              height: "0",
+              opacity: 0,
+              margin: 0,
+            })
+          ),
         ]),
       ]),
     ],
