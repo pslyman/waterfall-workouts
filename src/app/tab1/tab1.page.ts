@@ -420,7 +420,7 @@ export class Tab1Page implements OnInit {
 
     this.localNotifications.schedule({
       title: `Time's up!`,
-      text: `Your timer for ${name} has ended.`,
+      text: `Your timer for ${itemName} has ended.`,
       foreground: true,
       silent: false,
       priority: 2,
