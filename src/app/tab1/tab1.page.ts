@@ -38,11 +38,11 @@ interface workoutsInt {
     trigger("inOutAnimation", [
       transition(":enter", [
         animate(
-          ".5s ease-out",
+          ".3s ease-out",
           keyframes([
             style({
               opacity: 0,
-              transform: "translateY(-15px) scale(1.05)",
+              transform: "translateY(-35px) scale(1.05)",
               offset: 0,
             }),
             style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
@@ -431,6 +431,18 @@ export class Tab1Page implements OnInit {
       new Date().valueOf() + Number(timerAmount) * 60000
     ).getTime();
 
+    this.localNotifications.schedule({
+      title: `Time's up!`,
+      text: `Your timer for ${name} has ended.`,
+      foreground: true,
+      silent: false,
+      priority: 2,
+      smallIcon: "res://notificationicon.png",
+      trigger: {
+        at: new Date(new Date().valueOf() + Number(timerAmount) * 60000),
+      },
+    });
+
     // Update the count down every 1 second
     this.thatTimerThing = setInterval(() => {
       // Get today's date and time
@@ -479,18 +491,10 @@ export class Tab1Page implements OnInit {
 
   timeDone(name: string) {
     this.vibration.vibrate(1500);
-
-    this.localNotifications.schedule({
-      title: `Time's up!`,
-      text: `Your timer for ${name} has ended.`,
-      foreground: true,
-      silent: false,
-      priority: 2,
-      smallIcon: "res://notificationicon.png",
-    });
   }
 
   stopTimer() {
+    this.localNotifications.cancelAll();
     this.timerActive = false;
     this.insomnia.allowSleepAgain().then(
       () => console.log("success"),
