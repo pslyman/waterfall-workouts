@@ -70,7 +70,10 @@ interface workoutsInt {
       trigger("helpCardIn", [
         transition(":enter", [
           style({ transform: "scale(.8)", height: "0", opacity: 0 }),
-          animate(".5s ease-out", style({ transform: "scale(1)", height: "50px", opacity: 1 })),
+          animate(
+            ".5s ease-out",
+            style({ transform: "scale(1)", height: "50px", opacity: 1 })
+          ),
         ]),
         transition(":leave", [
           style({ height: "50px", opacity: 1 }),
@@ -112,34 +115,6 @@ interface workoutsInt {
                     offset: 0.3,
                   }),
                   style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
-                ])
-              ),
-            ]),
-            { optional: true }
-          ),
-
-          // Cards will disappear sequentially with the delay of 300ms
-          query(
-            ":leave",
-            stagger("6ms", [
-              animate(
-                "150ms ease-out",
-                keyframes([
-                  style({
-                    opacity: 1,
-                    transform: "translateY(0px)",
-                    offset: 0,
-                  }),
-                  style({
-                    opacity: 0.5,
-                    transform: "translateY(5px)",
-                    offset: 0.3,
-                  }),
-                  style({
-                    opacity: 0,
-                    transform: "translateY(10px) scale(.995)",
-                    offset: 1,
-                  }),
                 ])
               ),
             ]),
