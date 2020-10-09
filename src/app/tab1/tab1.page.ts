@@ -42,7 +42,7 @@ interface workoutsInt {
           keyframes([
             style({
               opacity: 0,
-              transform: "translateY(-10px)",
+              transform: "translateY(-15px) scale(1.05)",
               offset: 0,
             }),
             style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
