@@ -163,9 +163,7 @@ export class Tab1Page implements OnInit {
 
   ngOnInit() {
     this.getStorage();
-    this.platform.ready().then(() => {
-      this.statusBar.styleLightContent();
-    });
+
     this.storage.get("useMetricDefault").then((value) => {
       if (value) {
         this.useMetric = value;
@@ -173,7 +171,7 @@ export class Tab1Page implements OnInit {
         this.storage.set("useMetricDefault", "true");
       }
     });
-    this.loadTheme();
+    
   }
 
   toggleMoonlight() {
@@ -207,39 +205,7 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  loadTheme() {
-    this.storage.get("theme").then((value) => {
-      if (value) {
-        var element = document.getElementById("body-theme");
 
-        element.classList.add(value);
-
-        if (this.platform.is("android")) {
-          if (value === "light") {
-            this.statusBar.backgroundColorByHexString("#ffffff");
-            this.statusBar.styleDefault();
-            return;
-          }
-          if (value === "dark") {
-            this.statusBar.backgroundColorByHexString("#1f1f1f");
-            this.statusBar.styleLightContent();
-            return;
-          }
-
-          return;
-        }
-      } else {
-        this.storage.set("theme", "light");
-        var element = document.getElementById("body-theme");
-
-        if (this.platform.is("android")) {
-          this.statusBar.backgroundColorByHexString("#ffffff");
-          this.statusBar.styleDefault();
-          return;
-        }
-      }
-    });
-  }
 
   colorValueChange(value) {
     if (this.platform.is("android")) {
@@ -287,7 +253,7 @@ export class Tab1Page implements OnInit {
   saveToStorage() {
     this.sortWorkouts();
     this.storage.set("workouts", JSON.stringify(this.workoutNames));
-    this.cloudSettings.save("");
+    this.cloudSettings.save("", true);
 
     let temporaryObject = { savedWorkouts: this.workoutNames };
     this.cloudSettings
@@ -367,6 +333,7 @@ export class Tab1Page implements OnInit {
         match.originDate = this.getCurrentTimeNumber();
       }
     }
+    this.saveToStorage();
   }
   itemSetAddition(name: string) {
     let match = this.workoutNames.find((i) => i.name === name);
@@ -374,6 +341,7 @@ export class Tab1Page implements OnInit {
     if (!!match && match.setsDone > 0) {
       match.setsDone--;
     }
+    this.saveToStorage();
   }
 
   setTimerActive() {
@@ -645,6 +613,7 @@ export class Tab1Page implements OnInit {
     this.nameOfEditItem = itemName;
     this.inEdit = true;
     this.newActive = true;
+    this.saveToStorage();
   }
 
   cancelChanges() {

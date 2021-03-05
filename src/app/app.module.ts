@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
 import { Vibration } from '@ionic-native/vibration/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { IonicStorageModule } from "@ionic/storage";
 
 
 @NgModule({
@@ -22,7 +23,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    BrowserAnimationsModule,
+    BrowserAnimationsModule, IonicStorageModule.forRoot()
   ],
   providers: [
     StatusBar,
@@ -34,4 +35,4 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
