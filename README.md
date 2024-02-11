@@ -1,6 +1,6 @@
 # OpenTrackFit
 
-See app here: https://play.google.com/store/apps/details?id=plskye.openFit
+That app has been discontinued, in part because there are much better FOSS versions available now, but the code still exists here. 
 
 Clone repo
 - npm install
