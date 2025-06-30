@@ -1,6 +1,4 @@
-# OpenTrackFit
-
-That app has been discontinued, in part because there are much better FOSS versions available now, but the code still exists here. 
+# Waterfall Workouts
 
 Clone repo
 - npm install
