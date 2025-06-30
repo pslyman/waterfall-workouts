@@ -44,7 +44,6 @@
               }
             ],
             "scripts": [],
-            "aot": false,
             "extractLicenses": false,
             "sourceMap": true,
             "optimization": false,
@@ -88,8 +87,7 @@
             "production": {
               "buildTarget": "app:build:production"
             },
-            "ci": {
-            }
+            "ci": {}
           }
         },
         "extract-i18n": {
@@ -139,30 +137,6 @@
             },
             "ci": {
               "devServerTarget": "app:serve:ci"
-            }
-          }
-        },
-        "ionic-cordova-build": {
-          "builder": "@ionic/angular-toolkit:cordova-build",
-          "options": {
-            "browserTarget": "app:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "app:build:production"
-            }
-          }
-        },
-        "ionic-cordova-serve": {
-          "builder": "@ionic/angular-toolkit:cordova-serve",
-          "options": {
-            "cordovaBuildTarget": "app:ionic-cordova-build",
-            "devServerTarget": "app:serve"
-          },
-          "configurations": {
-            "production": {
-              "cordovaBuildTarget": "app:ionic-cordova-build:production",
-              "devServerTarget": "app:serve:production"
             }
           }
         }
