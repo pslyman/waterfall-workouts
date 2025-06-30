@@ -10,26 +10,17 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
-import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
-import { Vibration } from '@ionic-native/vibration/ngx';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
-import { IonicStorageModule } from "@ionic/storage";
-
-
 @NgModule({
     declarations: [AppComponent],
     imports: [
         BrowserModule,
         IonicModule.forRoot(),
         AppRoutingModule,
-        BrowserAnimationsModule, IonicStorageModule.forRoot()
+        BrowserAnimationsModule,
     ],
     providers: [
         StatusBar,
         SplashScreen,
-        CloudSettings,
-        Vibration,
-        LocalNotifications,
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     ],
     bootstrap: [AppComponent]
