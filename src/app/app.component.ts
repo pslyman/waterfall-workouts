@@ -1,37 +1,34 @@
-import { Component, OnInit } from '@angular/core';
-import { Storage } from "@ionic/storage";
-import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { Component, OnInit } from "@angular/core";
+import { Platform } from "@ionic/angular";
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StorageService } from "./services/storage.service";
 
 @Component({
-    selector: 'app-root',
-    templateUrl: 'app.component.html',
-    styleUrls: ['app.component.scss'],
-    standalone: false
+  selector: "app-root",
+  templateUrl: "app.component.html",
+  styleUrls: ["app.component.scss"],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   constructor(
     private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    private storage: Storage,
-  ) {
+    private storageService: StorageService
+  ) {}
 
-  }
-
-  ngOnInit() {
+  async ngOnInit() {
+    await this.storageService.init();
     this.loadTheme();
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
-      this.splashScreen.hide();
+    this.platform.ready().then(async () => {
+      await SplashScreen.hide();
     });
   }
 
-  loadTheme() {
-    this.storage.get("theme").then((value) => {
+loadTheme() {
+    this.storageService.get("theme").then(async (value) => {
       if (value) {
         var element = document.getElementById("body-theme");
 
@@ -39,15 +36,15 @@ export class AppComponent implements OnInit {
 
         if (this.platform.is("android")) {
           if (value === "light") {
-            this.statusBar.backgroundColorByHexString("#ffffff");
-            this.statusBar.styleDefault();
+            await StatusBar.setBackgroundColor({color: '#ffffff'});
+            await StatusBar.setStyle({style: Style.Dark})
             element.classList.remove("dark");
             this.initializeApp();
             return;
           }
           if (value === "dark") {
-            this.statusBar.backgroundColorByHexString("#1f1f1f");
-            this.statusBar.styleLightContent();
+            await StatusBar.setBackgroundColor({color: '#1f1f1f'});
+            await StatusBar.setStyle({style: Style.Light})
             this.initializeApp();
             return;
           }
@@ -57,12 +54,12 @@ export class AppComponent implements OnInit {
           this.initializeApp();
         }
       } else {
-        this.storage.set("theme", "light");
+        this.storageService.set("theme", "light");
         var element = document.getElementById("body-theme");
 
         if (this.platform.is("android")) {
-          this.statusBar.backgroundColorByHexString("#ffffff");
-          this.statusBar.styleDefault();
+            await StatusBar.setBackgroundColor({color: '#ffffff'});
+            await StatusBar.setStyle({style: Style.Dark})
           this.initializeApp();
           return;
         } else {
@@ -71,6 +68,5 @@ export class AppComponent implements OnInit {
       }
 
     });
-
   }
 }

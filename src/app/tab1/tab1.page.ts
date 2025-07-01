@@ -8,13 +8,10 @@ import {
   stagger,
 } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
+import { StatusBar, Style } from "@capacitor/status-bar";
 import { ToastController, Platform } from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
-import { Insomnia } from "@ionic-native/insomnia/ngx";
-import { Storage } from "@ionic/storage";
-import { StatusBar } from "@ionic-native/status-bar/ngx";
-import { CloudSettings } from "@ionic-native/cloud-settings/ngx";
-import { Vibration } from "@ionic-native/vibration/ngx";
+import { StorageService } from "../services/storage.service";
 
 interface workoutsInt {
   days: number;
@@ -25,7 +22,6 @@ interface workoutsInt {
   countdown: number;
   originDate: number;
   setsDone: number;
-  timeLeft: string;
   notes: string;
 }
 
@@ -123,30 +119,21 @@ export class Tab1Page implements OnInit {
   inEdit = false;
   nameOfEditItem = "";
 
-  timerDisplayed = "Starting timer";
-  timerActive = false;
-
-  thatTimerThing;
-
   constructor(
     public toastController: ToastController,
     public alertController: AlertController,
-    private insomnia: Insomnia,
-    private storage: Storage,
-    private statusBar: StatusBar,
+    private storageService: StorageService,
     private platform: Platform,
-    private cloudSettings: CloudSettings,
-    private vibration: Vibration
   ) { }
 
   ngOnInit() {
     this.getStorage();
 
-    this.storage.get("useMetricDefault").then((value) => {
+    this.storageService.get("useMetricDefault").then((value) => {
       if (value) {
         this.useMetric = value;
       } else {
-        this.storage.set("useMetricDefault", "true");
+        this.storageService.set("useMetricDefault", "true");
       }
     });
 
@@ -159,24 +146,24 @@ export class Tab1Page implements OnInit {
     element.classList.remove("dark");
     element.classList.remove("amoled");
 
-    this.storage.get("theme").then((value) => {
+    this.storageService.get("theme").then(async (value) => {
       if (value === "light") {
         element.classList.add("dark");
 
-        this.storage.set("theme", "dark");
+        this.storageService.set("theme", "dark");
       } else {
-        this.storage.set("theme", "light");
+        this.storageService.set("theme", "light");
       }
 
       if (this.platform.is("android")) {
         if (value === "dark") {
-          this.statusBar.backgroundColorByHexString("#ffffff");
-          this.statusBar.styleDefault();
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await StatusBar.setStyle({ style: Style.Dark })
           return;
         }
         if (value === "light") {
-          this.statusBar.backgroundColorByHexString("#1f1f1f");
-          this.statusBar.styleLightContent();
+          await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
+          await StatusBar.setStyle({ style: Style.Light })
           return;
         }
       }
@@ -185,16 +172,16 @@ export class Tab1Page implements OnInit {
 
 
 
-  colorValueChange(value) {
+  async colorValueChange(value) {
     if (this.platform.is("android")) {
       if (value === "light") {
-        this.statusBar.backgroundColorByHexString("#ffffff");
-        this.statusBar.styleDefault();
+        await StatusBar.setBackgroundColor({ color: '#ffffff' });
+        await StatusBar.setStyle({ style: Style.Dark })
         return;
       }
       if (value === "dark") {
-        this.statusBar.backgroundColorByHexString("#121212");
-        this.statusBar.styleLightContent();
+        await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
+        await StatusBar.setStyle({ style: Style.Light })
         return;
       }
 
@@ -203,27 +190,9 @@ export class Tab1Page implements OnInit {
   }
 
   getStorage() {
-    this.storage.get("workouts").then((list) => {
+    this.storageService.get("workouts").then((list) => {
       if (list) {
         this.workoutNames = JSON.parse(list);
-      } else {
-        this.workoutNames = [];
-
-        this.cloudSettings.exists().then(async (exists: boolean) => {
-          if (exists) {
-            this.cloudSettings
-              .load()
-              .then(async (backedUpWorkouts: any) => {
-                if (backedUpWorkouts) {
-                  this.workoutNames =
-                    backedUpWorkouts[Object.keys(backedUpWorkouts)[0]];
-                }
-              })
-              .catch((error: any) => {
-                alert(error);
-              });
-          }
-        });
       }
     });
   }
@@ -271,6 +240,8 @@ export class Tab1Page implements OnInit {
     if (!!match) {
       match.originDate = this.getCurrentTimeNumber();
     }
+
+    this.saveToStorage();
   }
 
   itemRestart(name: string) {
@@ -279,8 +250,8 @@ export class Tab1Page implements OnInit {
     if (!!match) {
       match.setsDone = 0;
       match.originDate = this.getCurrentTimeNumber() - 100000000;
-      match.timeLeft = this.newCountdown ? this.newCountdown.toString() : null;
     }
+    this.saveToStorage();
   }
 
   itemSetSubtraction(name: string) {
@@ -294,6 +265,7 @@ export class Tab1Page implements OnInit {
         match.originDate = this.getCurrentTimeNumber();
       }
     }
+    this.saveToStorage();
   }
   itemSetAddition(name: string) {
     let match = this.workoutNames.find((i) => i.name === name);
@@ -301,9 +273,11 @@ export class Tab1Page implements OnInit {
     if (!!match && match.setsDone > 0) {
       match.setsDone--;
     }
+    this.saveToStorage();
   }
 
   async toggleNew() {
+    this.saveToStorage();
     this.newActive = !this.newActive;
     this.clearAddWorkout();
   }
@@ -321,7 +295,7 @@ export class Tab1Page implements OnInit {
       }
     }
 
-    this.storage.get("useMetricDefault").then((value) => {
+    this.storageService.get("useMetricDefault").then((value) => {
       this.useMetric = value;
     });
     if (this.newWeight) {
@@ -349,9 +323,10 @@ export class Tab1Page implements OnInit {
       countdown: this.newCountdown,
       originDate: this.getCurrentTimeNumber() - 100000000,
       setsDone: 0,
-      timeLeft: this.newCountdown ? this.newCountdown.toString() : null,
       notes: this.newNotes,
     });
+
+    this.saveToStorage();
 
     const toast = await this.toastController.create({
       message: `${this.newName} added.`,
@@ -361,6 +336,11 @@ export class Tab1Page implements OnInit {
 
     this.clearAddWorkout();
     this.newActive = !this.newActive;
+  }
+
+  saveToStorage() {
+    this.sortWorkouts();
+    this.storageService.set("workouts", JSON.stringify(this.workoutNames));
   }
 
   clearAddWorkout() {
@@ -405,12 +385,12 @@ export class Tab1Page implements OnInit {
 
   radioChange(e) {
     this.useMetric = e.target.value;
-    this.storage.set("useMetricDefault", e.target.value);
+    this.storageService.set("useMetricDefault", e.target.value);
   }
 
   editItem(itemName) {
     let match = this.workoutNames.find((i) => i.name === itemName);
-    this.storage.get("useMetricDefault").then((value) => {
+    this.storageService.get("useMetricDefault").then((value) => {
       this.useMetric = value;
     });
     if (!!match) {
@@ -435,6 +415,7 @@ export class Tab1Page implements OnInit {
     this.nameOfEditItem = itemName;
     this.inEdit = true;
     this.newActive = true;
+    this.saveToStorage();
   }
 
   cancelChanges() {
@@ -444,7 +425,7 @@ export class Tab1Page implements OnInit {
   }
 
   async saveChanges() {
-    this.storage.get("useMetricDefault").then((value) => {
+    this.storageService.get("useMetricDefault").then((value) => {
       this.useMetric = value;
     });
     if (this.newWeight) {
@@ -468,6 +449,8 @@ export class Tab1Page implements OnInit {
       match.countdown = this.newCountdown;
       match.notes = this.newNotes;
     }
+
+    this.saveToStorage();
 
     const toast = await this.toastController.create({
       message: `${this.newName} updated.`,

@@ -1,5 +1,3 @@
-
-import { Insomnia } from '@ionic-native/insomnia/ngx';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -8,7 +6,6 @@ import { Tab1Page } from './tab1.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
-import { IonicStorageModule } from '@ionic/storage';
 
 
 @NgModule({
@@ -17,9 +14,8 @@ import { IonicStorageModule } from '@ionic/storage';
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
-    Tab1PageRoutingModule, IonicStorageModule.forRoot()
+    Tab1PageRoutingModule
   ],
-  providers: [Insomnia],
   declarations: [Tab1Page]
 })
-export class Tab1PageModule {}
+export class Tab1PageModule { }
