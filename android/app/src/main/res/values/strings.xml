@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WaterfallWorkouts</string>
+    <string name="title_activity_main">WaterfallWorkouts</string>
+    <string name="package_name">com.WaterfallWorkouts</string>
+    <string name="custom_url_scheme">com.WaterfallWorkouts</string>
+</resources>
