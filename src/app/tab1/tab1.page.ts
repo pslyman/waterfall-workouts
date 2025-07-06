@@ -158,12 +158,12 @@ export class Tab1Page implements OnInit {
       if (this.platform.is("android")) {
         if (value === "dark") {
           await StatusBar.setBackgroundColor({ color: '#ffffff' });
-          await StatusBar.setStyle({ style: Style.Dark })
+          await StatusBar.setStyle({ style: Style.Light })
           return;
         }
         if (value === "light") {
           await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
-          await StatusBar.setStyle({ style: Style.Light })
+          await StatusBar.setStyle({ style: Style.Dark })
           return;
         }
       }
@@ -176,12 +176,12 @@ export class Tab1Page implements OnInit {
     if (this.platform.is("android")) {
       if (value === "light") {
         await StatusBar.setBackgroundColor({ color: '#ffffff' });
-        await StatusBar.setStyle({ style: Style.Dark })
+        await StatusBar.setStyle({ style: Style.Light })
         return;
       }
       if (value === "dark") {
         await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
-        await StatusBar.setStyle({ style: Style.Light })
+        await StatusBar.setStyle({ style: Style.Dark })
         return;
       }
 
