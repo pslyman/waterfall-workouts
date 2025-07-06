@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.WaterfallWorkouts',
+  appId: 'com.waterfallworkouts',
   appName: 'WaterfallWorkouts',
-  webDir: 'www',
+  webDir: 'www/browser',
   cordova: {
     preferences: {
       ScrollEnabled: 'false',
