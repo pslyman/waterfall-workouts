@@ -22,7 +22,6 @@ export class StorageService {
   }
 
   public async get(key: string): Promise<any> {
-    console.log(await this._storage?.get(key));
     return await this._storage?.get(key);
   }
 }
