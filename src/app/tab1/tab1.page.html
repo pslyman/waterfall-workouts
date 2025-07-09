@@ -75,28 +75,23 @@
         </div>
         @if (getDifferenceBetweenTimes(item.originDate) !== 0) {
         <div class="vertical-buttons">
-          <ion-button (click)="itemDone(item.name)">Done</ion-button>
+          <!-- <ion-button (click)="itemDone(item.name)">Done</ion-button> -->
           @if (item.sets) {
           <div>
             <ion-button color="dark" (click)="itemSetSubtraction(item.name)"
-              >-</ion-button
-            ><ion-button
-              color="dark"
-              (click)="itemSetAddition(item.name)"
-              [disabled]="item.setsDone === 0"
-              >+</ion-button
+              >-1 Set</ion-button
             >
           </div>
           }
-          <ion-button color="dark" (click)="editItem(item.name)"
-            >Edit</ion-button
-          >
+          <ion-button color="medium" (click)="openActionSheet(item)"
+            ><ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon
+          ></ion-button>
         </div>
         } @if (getDifferenceBetweenTimes(item.originDate) === 0) {
         <div class="vertical-buttons --center">
-          <ion-button color="dark" (click)="itemRestart(item.name)"
-            >Restart</ion-button
-          >
+          <ion-button color="medium" (click)="openActionSheet(item)"
+            ><ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon
+          ></ion-button>
         </div>
         }
       </ion-card-content>

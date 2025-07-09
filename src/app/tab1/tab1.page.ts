@@ -9,7 +9,11 @@ import {
 } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
-import { ToastController, Platform } from "@ionic/angular";
+import {
+  ToastController,
+  Platform,
+  ActionSheetController,
+} from "@ionic/angular";
 import { AlertController } from "@ionic/angular";
 import { StorageService } from "../services/storage.service";
 
@@ -143,6 +147,7 @@ export class Tab1Page implements OnInit {
     public alertController: AlertController,
     private storageService: StorageService,
     private platform: Platform,
+    private actionSheetCtrl: ActionSheetController,
   ) {}
 
   ngOnInit() {
@@ -192,7 +197,44 @@ export class Tab1Page implements OnInit {
     // placeholder
   }
 
-  async colorValueChange(value) {
+  async openActionSheet(item: workoutsInt): Promise<void> {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: "Actions",
+      buttons: [
+        {
+          text: "Edit",
+          handler: (): void => {
+            this.editItem(item.name);
+          },
+        },
+        {
+          text: "Restart",
+          handler: (): void => {
+            this.itemRestart(item.name);
+          },
+        },
+        {
+          text: "Delete",
+          role: "destructive",
+          handler: (): void => {
+            this.nameOfEditItem = item.name;
+            this.deleteWorkout();
+          },
+        },
+        {
+          text: "Dismiss",
+          role: "cancel",
+          handler: (): void => {
+            this.actionSheetCtrl.dismiss();
+          },
+        },
+      ],
+    });
+
+    await actionSheet.present();
+  }
+
+  async colorValueChange(value: string) {
     if (this.platform.is("android")) {
       if (value === "light") {
         await StatusBar.setBackgroundColor({ color: "#ffffff" });
@@ -287,6 +329,8 @@ export class Tab1Page implements OnInit {
     }
     this.saveToStorage();
   }
+
+  // Not currently in use
   itemSetAddition(name: string) {
     let match = this.workoutNames.find((i) => i.name === name);
 
