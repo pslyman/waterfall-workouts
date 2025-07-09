@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="plskye.openFit" version="1.1.14" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>WaterfallWorkouts</name>
-    <description>WaterfallWorkouts for tracking your workouts more efficiently.</description>
+<widget id="com.waterfallworkouts" version="1.1.14" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Waterfall Workouts</name>
+    <description>Waterfall Workouts for tracking your workouts more efficiently.</description>
     <author email="hi@ionicframework.com" href="http://ionicframework.com/">porterlyman</author>
     <content src="index.html" />
     <access origin="*" />

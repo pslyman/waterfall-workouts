@@ -6,6 +6,10 @@
 .vertical-buttons {
   display: flex;
   flex-direction: column;
+
+  &.--center {
+    justify-content: center;
+  }
 }
 
 .grey-off {
@@ -50,10 +54,11 @@
   max-width: 72%;
 }
 
-ion-header{
-    z-index: 100;
+ion-header {
+  z-index: 100;
 }
 
 .late-text {
   color: #da5a5a;
 }
+

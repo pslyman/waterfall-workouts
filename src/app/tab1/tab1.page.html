@@ -1,13 +1,20 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> WaterfallWorkouts </ion-title>
+    <ion-title> Waterfall Workouts </ion-title>
 
     <ion-buttons slot="primary">
+      <ion-button (click)="openInformation()" class="grey-off">
+        <ion-icon slot="icon-only" name="help-circle"></ion-icon
+      ></ion-button>
       <ion-button class="grey-off" (click)="toggleMoonlight()">
         <ion-icon slot="icon-only" name="moon"></ion-icon>
       </ion-button>
       @if (!inEdit) {
-      <ion-button color="primary" (click)="toggleNew()" [ngClass]="{'grey-off': !newActive}">
+      <ion-button
+        color="primary"
+        (click)="toggleNew()"
+        [ngClass]="{'grey-off': !newActive}"
+      >
         <ion-icon slot="icon-only" name="add-circle"></ion-icon>
       </ion-button>
       }
@@ -28,9 +35,7 @@
       <h2>Click the + button to add a workout</h2>
     </ion-card-content>
   </ion-card>
-  }
-
-  @if (!newActive) {
+  } @if (!newActive) {
   <div [@cardAnimation]="workoutNames.length">
     @for (item of workoutNames; track item) {
     <ion-card>
@@ -49,16 +54,14 @@
               <span>Reps: {{item.reps}}</span>
               }
             </p>
-            }
-            @if (item.weight) {
+            } @if (item.weight) {
             <p>Weight: {{item.weight}}</p>
+            } @if (item.countdown) {
+            <p>Time: {{item.countdown}} minutes</p>
             }
-            @if (item.countdown) {
-            <p>
-              Time: {{item.countdown}} minutes
-            </p>
-            }
-            <p [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) <= 1)}">
+            <p
+              [ngClass]="{'late-text': ((item.days / this.getDifferenceBetweenTimes(item.originDate)) <= 1)}"
+            >
               Days since: {{getDifferenceBetweenTimes(item.originDate)}}
               ({{item.days}} max)
             </p>
@@ -66,6 +69,8 @@
             <p>{{ item.notes }}</p>
             }
           </div>
+          } @else {
+          <span>(completed)</span>
           }
         </div>
         @if (getDifferenceBetweenTimes(item.originDate) !== 0) {
@@ -73,47 +78,72 @@
           <ion-button (click)="itemDone(item.name)">Done</ion-button>
           @if (item.sets) {
           <div>
-            <ion-button color="dark" (click)="itemSetSubtraction(item.name)">-</ion-button><ion-button color="dark"
-              (click)="itemSetAddition(item.name)" [disabled]="item.setsDone === 0">+</ion-button>
+            <ion-button color="dark" (click)="itemSetSubtraction(item.name)"
+              >-</ion-button
+            ><ion-button
+              color="dark"
+              (click)="itemSetAddition(item.name)"
+              [disabled]="item.setsDone === 0"
+              >+</ion-button
+            >
           </div>
           }
-          <ion-button color="dark" (click)="editItem(item.name)">Edit</ion-button>
+          <ion-button color="dark" (click)="editItem(item.name)"
+            >Edit</ion-button
+          >
         </div>
-        }
-        @if (getDifferenceBetweenTimes(item.originDate) === 0) {
-        <div class="vertical-buttons">
-          <ion-button color="dark" (click)="itemRestart(item.name)">Restart</ion-button>
+        } @if (getDifferenceBetweenTimes(item.originDate) === 0) {
+        <div class="vertical-buttons --center">
+          <ion-button color="dark" (click)="itemRestart(item.name)"
+            >Restart</ion-button
+          >
         </div>
         }
       </ion-card-content>
     </ion-card>
     }
   </div>
-  }
-
-  @if (newActive) {
+  } @if (newActive) {
   <div class="new-add-modal" [@inOutAnimation]>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">*Name</ion-label>
-        <ion-input placeholder="What will you call this workout?" [(ngModel)]="newName"></ion-input>
+        <ion-input
+          placeholder="What will you call this workout?"
+          [(ngModel)]="newName"
+        ></ion-input>
       </ion-item>
     </ion-card>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">Reps</ion-label>
-        <ion-input type="number" placeholder="Number of reps" [(ngModel)]="newReps"></ion-input>
+        <ion-input
+          type="number"
+          placeholder="Number of reps"
+          [(ngModel)]="newReps"
+        ></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked">Sets</ion-label>
-        <ion-input type="number" placeholder="Number of sets" [(ngModel)]="newSets"></ion-input>
+        <ion-input
+          type="number"
+          placeholder="Number of sets"
+          [(ngModel)]="newSets"
+        ></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked">Weight</ion-label>
-        <ion-input type="number" placeholder="How heavy?" [(ngModel)]="newWeight"></ion-input>
+        <ion-input
+          type="number"
+          placeholder="How heavy?"
+          [(ngModel)]="newWeight"
+        ></ion-input>
       </ion-item>
       <ion-list>
-        <ion-radio-group (ionChange)="radioChange($event)" [(ngModel)]="useMetric">
+        <ion-radio-group
+          (ionChange)="radioChange($event)"
+          [(ngModel)]="useMetric"
+        >
           <ion-item>
             <ion-label>kg</ion-label>
             <ion-radio slot="start" value="true"> </ion-radio>
@@ -121,24 +151,36 @@
           <ion-item>
             <ion-label>lbs</ion-label>
             <ion-radio slot="start" value="false"></ion-radio>
-          </ion-item> </ion-radio-group></ion-list>
+          </ion-item> </ion-radio-group
+      ></ion-list>
     </ion-card>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">Time </ion-label>
-        <ion-input type="number" placeholder="How long in minutes" [(ngModel)]="newCountdown"></ion-input>
+        <ion-input
+          type="number"
+          placeholder="How long in minutes"
+          [(ngModel)]="newCountdown"
+        ></ion-input>
       </ion-item>
     </ion-card>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">*Days (default 3)</ion-label>
-        <ion-input type="number" [(ngModel)]="newDays" placeholder="Max number of days to pass between"></ion-input>
+        <ion-input
+          type="number"
+          [(ngModel)]="newDays"
+          placeholder="Max number of days to pass between"
+        ></ion-input>
       </ion-item>
     </ion-card>
     <ion-card>
       <ion-item>
         <ion-label position="stacked">Notes</ion-label>
-        <ion-input placeholder="Anything you'll forget?" [(ngModel)]="newNotes"></ion-input>
+        <ion-input
+          placeholder="Anything you'll forget?"
+          [(ngModel)]="newNotes"
+        ></ion-input>
       </ion-item>
       <ion-item>
         <p class="required-text">*required</p>
@@ -147,18 +189,24 @@
     <ion-card class="add-workout-bton-container">
       @if (inEdit) {
       <ion-button color="danger" (click)="deleteWorkout()">Remove</ion-button>
-      }
-      @if (!inEdit) {
+      } @if (!inEdit) {
       <ion-button color="dark" (click)="clearAddWorkout()">Clear</ion-button>
       }@if (!inEdit) {
-      <ion-button (click)="addNewWorkout()" [disabled]="!this.newName">Add New Workout</ion-button>
+      <ion-button (click)="addNewWorkout()" [disabled]="!this.newName"
+        >Add New Workout</ion-button
+      >
       }@if (inEdit) {
-      <ion-button (click)="saveChanges()" [disabled]="!this.newName">Save</ion-button>
-      }<ion-button (click)="cancelChanges()" color="dark">@if (!inEdit) {
+      <ion-button (click)="saveChanges()" [disabled]="!this.newName"
+        >Save</ion-button
+      >
+      }<ion-button (click)="cancelChanges()" color="dark"
+        >@if (!inEdit) {
         <span>Close</span>
         }@if (inEdit) {
         <span>Cancel</span>
-        }</ion-button></ion-card>
+        }</ion-button
+      ></ion-card
+    >
   </div>
   }
 </ion-content>

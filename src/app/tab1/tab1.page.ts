@@ -32,14 +32,17 @@ interface workoutsInt {
   animations: [
     trigger("inOutAnimation", [
       transition(":enter", [
-        animate(".3s ease-out", keyframes([
-          style({
-            opacity: 0,
-            transform: "translateY(-35px) scale(1.05)",
-            offset: 0,
-          }),
-          style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
-        ])),
+        animate(
+          ".3s ease-out",
+          keyframes([
+            style({
+              opacity: 0,
+              transform: "translateY(-35px) scale(1.05)",
+              offset: 0,
+            }),
+            style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
+          ]),
+        ),
       ]),
     ]),
     [
@@ -50,7 +53,10 @@ interface workoutsInt {
         ]),
         transition(":leave", [
           style({ transform: "scale(1)", top: 0, opacity: 1 }),
-          animate(".2s ease-out", style({ transform: "scale(.8)", top: "75px", opacity: 0 })),
+          animate(
+            ".2s ease-out",
+            style({ transform: "scale(.8)", top: "75px", opacity: 0 }),
+          ),
         ]),
       ]),
     ],
@@ -58,16 +64,22 @@ interface workoutsInt {
       trigger("helpCardIn", [
         transition(":enter", [
           style({ transform: "scale(.8)", height: "0", opacity: 0 }),
-          animate(".5s ease-out", style({ transform: "scale(1)", height: "50px", opacity: 1 })),
+          animate(
+            ".5s ease-out",
+            style({ transform: "scale(1)", height: "50px", opacity: 1 }),
+          ),
         ]),
         transition(":leave", [
           style({ height: "50px", opacity: 1 }),
-          animate(".5s ease-out", style({
-            transform: "scale(.8)",
-            height: "0",
-            opacity: 0,
-            margin: 0,
-          })),
+          animate(
+            ".5s ease-out",
+            style({
+              transform: "scale(.8)",
+              height: "0",
+              opacity: 0,
+              margin: 0,
+            }),
+          ),
         ]),
       ]),
     ],
@@ -79,26 +91,33 @@ interface workoutsInt {
           // Initially the all cards are not visible
           query(":enter", style({ opacity: 0 }), { optional: true }),
           // Each card will appear sequentially with the delay of 300ms
-          query(":enter", stagger("45ms", [
-            animate(".5s ease-in", keyframes([
-              style({
-                opacity: 0,
-                transform: "translateY(-10px) scale(1.05)",
-                offset: 0,
-              }),
-              style({
-                opacity: 0.5,
-                transform: "translateY(-5px) scale(1)",
-                offset: 0.3,
-              }),
-              style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
-            ])),
-          ]), { optional: true }),
+          query(
+            ":enter",
+            stagger("45ms", [
+              animate(
+                ".5s ease-in",
+                keyframes([
+                  style({
+                    opacity: 0,
+                    transform: "translateY(-10px) scale(1.05)",
+                    offset: 0,
+                  }),
+                  style({
+                    opacity: 0.5,
+                    transform: "translateY(-5px) scale(1)",
+                    offset: 0.3,
+                  }),
+                  style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
+                ]),
+              ),
+            ]),
+            { optional: true },
+          ),
         ]),
       ]),
     ],
   ],
-  standalone: false
+  standalone: false,
 })
 export class Tab1Page implements OnInit {
   workoutNames: workoutsInt[] = [];
@@ -124,7 +143,7 @@ export class Tab1Page implements OnInit {
     public alertController: AlertController,
     private storageService: StorageService,
     private platform: Platform,
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getStorage();
@@ -136,7 +155,6 @@ export class Tab1Page implements OnInit {
         this.storageService.set("useMetricDefault", "true");
       }
     });
-
   }
 
   toggleMoonlight() {
@@ -157,31 +175,33 @@ export class Tab1Page implements OnInit {
 
       if (this.platform.is("android")) {
         if (value === "dark") {
-          await StatusBar.setBackgroundColor({ color: '#ffffff' });
-          await StatusBar.setStyle({ style: Style.Light })
+          await StatusBar.setBackgroundColor({ color: "#ffffff" });
+          await StatusBar.setStyle({ style: Style.Light });
           return;
         }
         if (value === "light") {
-          await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
-          await StatusBar.setStyle({ style: Style.Dark })
+          await StatusBar.setBackgroundColor({ color: "#1f1f1f" });
+          await StatusBar.setStyle({ style: Style.Dark });
           return;
         }
       }
     });
   }
 
-
+  openInformation(): void {
+    // placeholder
+  }
 
   async colorValueChange(value) {
     if (this.platform.is("android")) {
       if (value === "light") {
-        await StatusBar.setBackgroundColor({ color: '#ffffff' });
-        await StatusBar.setStyle({ style: Style.Light })
+        await StatusBar.setBackgroundColor({ color: "#ffffff" });
+        await StatusBar.setStyle({ style: Style.Light });
         return;
       }
       if (value === "dark") {
-        await StatusBar.setBackgroundColor({ color: '#1f1f1f' });
-        await StatusBar.setStyle({ style: Style.Dark })
+        await StatusBar.setBackgroundColor({ color: "#1f1f1f" });
+        await StatusBar.setStyle({ style: Style.Dark });
         return;
       }
 
@@ -202,16 +222,16 @@ export class Tab1Page implements OnInit {
       (this.getDifferenceBetweenTimes(a.originDate) === 0)
         .toString()
         .localeCompare(
-          (this.getDifferenceBetweenTimes(a.originDate) === 0).toString()
-        )
+          (this.getDifferenceBetweenTimes(a.originDate) === 0).toString(),
+        ),
     );
 
     this.workoutNames.sort((a, b) =>
       (a.days / this.getDifferenceBetweenTimes(a.originDate))
         .toString()
         .localeCompare(
-          (b.days / this.getDifferenceBetweenTimes(b.originDate)).toString()
-        )
+          (b.days / this.getDifferenceBetweenTimes(b.originDate)).toString(),
+        ),
     );
   }
 
@@ -224,7 +244,7 @@ export class Tab1Page implements OnInit {
     return Number(new Date(year, month, day));
   }
 
-  getDifferenceBetweenTimes(firstDate) {
+  getDifferenceBetweenTimes(firstDate: number) {
     const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
 
     const secondDate = this.getCurrentTimeNumber();
@@ -364,17 +384,16 @@ export class Tab1Page implements OnInit {
           text: "Cancel",
           role: "cancel",
           cssClass: "secondary",
-          handler: (blah) => { },
+          handler: (blah) => {},
         },
         {
           text: "Yes",
           handler: () => {
             this.workoutNames = this.workoutNames.filter(
-              (i) => i.name !== this.nameOfEditItem
+              (i) => i.name !== this.nameOfEditItem,
             );
             this.inEdit = false;
             this.newActive = false;
-
           },
         },
       ],
