@@ -202,15 +202,21 @@ export class Tab1Page implements OnInit {
       header: "Actions",
       buttons: [
         {
-          text: "Edit",
+          text: "Done",
           handler: (): void => {
-            this.editItem(item.name);
+            this.itemDone(item.name);
           },
         },
         {
           text: "Restart",
           handler: (): void => {
             this.itemRestart(item.name);
+          },
+        },
+        {
+          text: "Edit",
+          handler: (): void => {
+            this.editItem(item.name);
           },
         },
         {
