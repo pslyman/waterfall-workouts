@@ -76,7 +76,7 @@ export class AppComponent implements OnInit {
           return;
         }
       } else {
-        this.storageService.set('theme', 'light');
+        await this.storageService.set('theme', 'light');
         const element = document.getElementById('body-theme');
         if (!element) {
           return;

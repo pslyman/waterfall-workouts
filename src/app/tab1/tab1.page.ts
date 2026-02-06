@@ -20,10 +20,10 @@ import { StorageService } from "../services/storage.service";
 interface Workout {
   days: number;
   name: string;
-  sets: number;
-  reps: number;
+  sets: number | null;
+  reps: number | null;
   weight: string;
-  countdown: number;
+  countdown: number | null;
   originDate: number;
   setsDone: number;
   notes: string;
@@ -120,20 +120,32 @@ export class Tab1Page implements OnInit {
     private actionSheetCtrl: ActionSheetController,
   ) {}
 
-  ngOnInit() {
-    this.getStorage();
+  async ngOnInit(): Promise<void> {
+    try {
+      await this.storageService.init();
+      await this.loadWorkouts();
 
-    this.storageService.get<string>("useMetricDefault").then((value) => {
-      if (value) {
-        this.useMetric = value;
-      } else {
-        this.storageService.set("useMetricDefault", "true");
+      const metricDefault = await this.storageService.get<string>(
+        "useMetricDefault",
+      );
+
+      if (metricDefault) {
+        this.useMetric = metricDefault;
+        return;
       }
-    });
+
+      this.useMetric = "true";
+      await this.storageService.set("useMetricDefault", "true");
+    } catch {
+      const toast = await this.toastController.create({
+        message: "Storage failed to initialize",
+        duration: 2000,
+      });
+      await toast.present();
+    }
   }
 
-  toggleMoonlight() {
-    this.getStorage();
+  async toggleMoonlight(): Promise<void> {
     const element = document.getElementById("body-theme");
     if (!element) {
       return;
@@ -142,28 +154,24 @@ export class Tab1Page implements OnInit {
     element.classList.remove("dark");
     element.classList.remove("amoled");
 
-    this.storageService.get<string>("theme").then(async (value) => {
-      if (value === "light") {
-        element.classList.add("dark");
+    const currentTheme = await this.storageService.get<string>("theme");
+    const nextTheme = currentTheme === "light" ? "dark" : "light";
 
-        this.storageService.set("theme", "dark");
-      } else {
-        this.storageService.set("theme", "light");
-      }
+    element.classList.add(nextTheme);
+    await this.storageService.set("theme", nextTheme);
 
-      if (this.platform.is("android")) {
-        if (value === "dark") {
-          await StatusBar.setBackgroundColor({ color: "#ffffff" });
-          await StatusBar.setStyle({ style: Style.Light });
-          return;
-        }
-        if (value === "light") {
-          await StatusBar.setBackgroundColor({ color: "#1f1f1f" });
-          await StatusBar.setStyle({ style: Style.Dark });
-          return;
-        }
+    if (this.platform.is("android")) {
+      if (nextTheme === "light") {
+        await StatusBar.setBackgroundColor({ color: "#ffffff" });
+        await StatusBar.setStyle({ style: Style.Light });
+        return;
       }
-    });
+      if (nextTheme === "dark") {
+        await StatusBar.setBackgroundColor({ color: "#1f1f1f" });
+        await StatusBar.setStyle({ style: Style.Dark });
+        return;
+      }
+    }
   }
 
   async openInformation(): Promise<void> {
@@ -183,13 +191,13 @@ export class Tab1Page implements OnInit {
         {
           text: "Done",
           handler: (): void => {
-            this.itemDone(item.name);
+            void this.itemDone(item.name);
           },
         },
         {
           text: "Restart",
           handler: (): void => {
-            this.itemRestart(item.name);
+            void this.itemRestart(item.name);
           },
         },
         {
@@ -203,7 +211,7 @@ export class Tab1Page implements OnInit {
           role: "destructive",
           handler: (): void => {
             this.nameOfEditItem = item.name;
-            this.deleteWorkout();
+            void this.deleteWorkout();
           },
         },
         {
@@ -236,12 +244,32 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  getStorage() {
-    this.storageService.get<string>("workouts").then((list) => {
-      if (list) {
-        this.workoutNames = JSON.parse(list);
-      }
-    });
+  private async loadWorkouts(): Promise<void> {
+    let stored: string | Workout[] | null = null;
+
+    try {
+      stored = await this.storageService.get<string | Workout[]>("workouts");
+    } catch {
+      this.workoutNames = [];
+      return;
+    }
+
+    if (!stored) {
+      this.workoutNames = [];
+      return;
+    }
+
+    if (Array.isArray(stored)) {
+      this.workoutNames = stored;
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+      this.workoutNames = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      this.workoutNames = [];
+    }
   }
 
   sortWorkouts() {
@@ -273,30 +301,31 @@ export class Tab1Page implements OnInit {
     return diffDays;
   }
 
-  itemDone(name: string) {
+  async itemDone(name: string): Promise<void> {
     const match = this.workoutNames.find((i) => i.name === name);
 
     if (match) {
       match.originDate = this.getCurrentTimeNumber();
     }
 
-    this.saveToStorage();
+    await this.persistWorkouts();
   }
 
-  itemRestart(name: string) {
+  async itemRestart(name: string): Promise<void> {
     const match = this.workoutNames.find((i) => i.name === name);
 
     if (match) {
       match.setsDone = 0;
       match.originDate = this.getCurrentTimeNumber() - 100000000;
     }
-    this.saveToStorage();
+
+    await this.persistWorkouts();
   }
 
-  itemSetSubtraction(name: string) {
+  async itemSetSubtraction(name: string): Promise<void> {
     const match = this.workoutNames.find((i) => i.name === name);
 
-    if (match && match.setsDone !== match.sets) {
+    if (match && match.sets && match.setsDone < match.sets) {
       match.setsDone++;
 
       if (match.setsDone === match.sets) {
@@ -304,86 +333,115 @@ export class Tab1Page implements OnInit {
         match.originDate = this.getCurrentTimeNumber();
       }
     }
-    this.saveToStorage();
+
+    await this.persistWorkouts();
   }
 
   // Not currently in use
-  itemSetAddition(name: string) {
+  async itemSetAddition(name: string): Promise<void> {
     const match = this.workoutNames.find((i) => i.name === name);
 
     if (match && match.setsDone > 0) {
       match.setsDone--;
     }
-    this.saveToStorage();
+
+    await this.persistWorkouts();
   }
 
-  async toggleNew() {
-    this.saveToStorage();
-    this.newActive = !this.newActive;
+  toggleNew(): void {
+    if (this.newActive) {
+      this.cancelChanges();
+      return;
+    }
+
+    this.inEdit = false;
+    this.nameOfEditItem = "";
     this.clearAddWorkout();
+    this.newActive = true;
   }
 
-  async addNewWorkout() {
-    if (this.workoutNames) {
-      if (this.workoutNames.some((i) => i.name === this.newName)) {
-        const toast = await this.toastController.create({
-          message: `"${this.newName}" already exists`,
-          duration: 2000,
-        });
-        toast.present();
+  async addNewWorkout(): Promise<void> {
+    const name = this.newName.trim();
 
-        return;
-      }
+    if (!name) {
+      const toast = await this.toastController.create({
+        message: "Workout name is required",
+        duration: 2000,
+      });
+      await toast.present();
+      return;
     }
 
-    this.storageService.get<string>("useMetricDefault").then((value) => {
-      if (value) {
-        this.useMetric = value;
-      }
-    });
-    if (this.newWeight) {
-      if (this.useMetric === "true") {
-        this.newWeightType = "kg";
-        this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      } else if (this.useMetric === "false") {
-        this.newWeightType = "lbs";
-        this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      }
+    if (this.workoutNames.some((i) => i.name === name)) {
+      const toast = await this.toastController.create({
+        message: `"${name}" already exists`,
+        duration: 2000,
+      });
+      await toast.present();
+      return;
     }
 
-    if (!this.newDays) {
-      this.newDays = 3;
-    }
-
-    this.workoutNames = this.workoutNames || [];
+    const days = this.toNumberOrNull(this.newDays) ?? 3;
 
     this.workoutNames.push({
-      days: this.newDays,
-      name: this.newName,
-      sets: this.newSets,
-      reps: this.newReps,
-      weight: `${this.newWeight}`,
-      countdown: this.newCountdown,
+      days,
+      name,
+      sets: this.toNumberOrNull(this.newSets),
+      reps: this.toNumberOrNull(this.newReps),
+      weight: this.formatWeight(this.newWeight),
+      countdown: this.toNumberOrNull(this.newCountdown),
       originDate: this.getCurrentTimeNumber() - 100000000,
       setsDone: 0,
       notes: this.newNotes,
     });
 
-    this.saveToStorage();
+    const didSave = await this.persistWorkouts();
+    if (!didSave) {
+      return;
+    }
 
     const toast = await this.toastController.create({
-      message: `${this.newName} added.`,
+      message: `${name} added.`,
       duration: 4000,
     });
-    toast.present();
+    await toast.present();
 
-    this.clearAddWorkout();
-    this.newActive = !this.newActive;
+    this.cancelChanges();
   }
 
-  saveToStorage() {
+  private toNumberOrNull(value: unknown): number | null {
+    if (value === null || value === undefined || value === "") {
+      return null;
+    }
+
+    const numberValue = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(numberValue) ? numberValue : null;
+  }
+
+  private formatWeight(value: unknown): string {
+    const raw = String(value ?? "").trim();
+    if (!raw) {
+      return "";
+    }
+
+    const unit = this.useMetric === "true" ? "kg" : "lbs";
+    return `${raw}${unit}`;
+  }
+
+  private async persistWorkouts(): Promise<boolean> {
     this.sortWorkouts();
-    this.storageService.set("workouts", JSON.stringify(this.workoutNames));
+
+    try {
+      await this.storageService.set("workouts", JSON.stringify(this.workoutNames));
+      return true;
+    } catch {
+      const toast = await this.toastController.create({
+        message: "Failed to save workouts.",
+        duration: 2000,
+      });
+      await toast.present();
+      return false;
+    }
   }
 
   clearAddWorkout() {
@@ -398,10 +456,12 @@ export class Tab1Page implements OnInit {
   }
 
   async deleteWorkout() {
+    const nameToDelete = this.nameOfEditItem;
+
     const alert = await this.alertController.create({
       cssClass: "my-custom-class",
       header: "Confirm",
-      message: `Are you sure you want to delete ${this.nameOfEditItem}?`,
+      message: `Are you sure you want to delete ${nameToDelete}?`,
       buttons: [
         {
           text: "Cancel",
@@ -410,12 +470,9 @@ export class Tab1Page implements OnInit {
         },
         {
           text: "Yes",
-          handler: () => {
-            this.workoutNames = this.workoutNames.filter(
-              (i) => i.name !== this.nameOfEditItem,
-            );
-            this.inEdit = false;
-            this.newActive = false;
+          role: "destructive",
+          handler: (): void => {
+            void this.deleteWorkoutConfirmed(nameToDelete);
           },
         },
       ],
@@ -424,87 +481,109 @@ export class Tab1Page implements OnInit {
     await alert.present();
   }
 
-  radioChange(e) {
-    this.useMetric = e.target.value;
-    this.storageService.set("useMetricDefault", e.target.value);
+  private async deleteWorkoutConfirmed(nameToDelete: string): Promise<void> {
+    this.workoutNames = this.workoutNames.filter((i) => i.name !== nameToDelete);
+
+    const didSave = await this.persistWorkouts();
+    if (!didSave) {
+      return;
+    }
+
+    const toast = await this.toastController.create({
+      message: `${nameToDelete} deleted.`,
+      duration: 2000,
+    });
+    await toast.present();
+
+    this.cancelChanges();
   }
 
-  editItem(itemName) {
+  async radioChange(e: CustomEvent<{ value: string }>): Promise<void> {
+    this.useMetric = e.detail.value;
+    await this.storageService.set("useMetricDefault", e.detail.value);
+  }
+
+  editItem(itemName: string): void {
     const match = this.workoutNames.find((i) => i.name === itemName);
-    this.storageService.get<string>("useMetricDefault").then((value) => {
-      if (value) {
-        this.useMetric = value;
-      }
-    });
-    if (match) {
-      this.newName = match.name;
-      this.newDays = match.days;
-      this.newSets = match.sets;
-      this.newReps = match.reps;
-      this.newWeight = match.weight.replace(/\D/g, "");
 
-      if (match.weight) {
-        const grabType = match.weight.match(/[a-zA-Z]+/g);
-
-        if (grabType[0] === "kg") {
-          this.useMetric = "true";
-        } else {
-          this.useMetric = "false";
-        }
-      }
-      this.newCountdown = match.countdown;
-      this.newNotes = match.notes;
+    if (!match) {
+      return;
     }
+
+    this.newName = match.name;
+    this.newDays = match.days;
+    this.newSets = match.sets;
+    this.newReps = match.reps;
+    this.newWeight = match.weight ? match.weight.replace(/[^0-9.]/g, "") : "";
+
+    const unit = match.weight.match(/[a-zA-Z]+/)?.[0];
+    if (unit === "kg") {
+      this.useMetric = "true";
+    }
+    if (unit === "lbs") {
+      this.useMetric = "false";
+    }
+
+    this.newCountdown = match.countdown;
+    this.newNotes = match.notes;
+
     this.nameOfEditItem = itemName;
     this.inEdit = true;
     this.newActive = true;
-    this.saveToStorage();
   }
 
   cancelChanges() {
     this.inEdit = false;
+    this.nameOfEditItem = "";
     this.newActive = false;
     this.clearAddWorkout();
   }
 
   async saveChanges() {
-    this.storageService.get<string>("useMetricDefault").then((value) => {
-      if (value) {
-        this.useMetric = value;
-      }
-    });
-    if (this.newWeight) {
-      if (this.useMetric === "true") {
-        this.newWeightType = "kg";
-        this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      } else if (this.useMetric === "false") {
-        this.newWeightType = "lbs";
-        this.newWeight = `${this.newWeight}${this.newWeightType}`;
-      }
+    const name = this.newName.trim();
+    const originalName = this.nameOfEditItem;
+
+    if (!name) {
+      const toast = await this.toastController.create({
+        message: "Workout name is required",
+        duration: 2000,
+      });
+      await toast.present();
+      return;
+    }
+
+    if (name !== originalName && this.workoutNames.some((i) => i.name === name)) {
+      const toast = await this.toastController.create({
+        message: `"${name}" already exists`,
+        duration: 2000,
+      });
+      await toast.present();
+      return;
     }
 
     const match = this.workoutNames.find((i) => i.name === this.nameOfEditItem);
 
     if (match) {
-      match.days = this.newDays;
-      match.name = this.newName;
-      match.sets = this.newSets;
-      match.reps = this.newReps;
-      match.weight = `${this.newWeight}`;
-      match.countdown = this.newCountdown;
+      match.days = this.toNumberOrNull(this.newDays) ?? 3;
+      match.name = name;
+      match.sets = this.toNumberOrNull(this.newSets);
+      match.reps = this.toNumberOrNull(this.newReps);
+      match.weight = this.formatWeight(this.newWeight);
+      match.countdown = this.toNumberOrNull(this.newCountdown);
       match.notes = this.newNotes;
     }
 
-    this.saveToStorage();
+    const didSave = await this.persistWorkouts();
+    if (!didSave) {
+      return;
+    }
 
     const toast = await this.toastController.create({
-      message: `${this.newName} updated.`,
+      message: `${name} updated.`,
       duration: 2000,
     });
-    toast.present();
+    await toast.present();
 
-    this.inEdit = false;
-    this.newActive = false;
-    this.clearAddWorkout();
+    this.cancelChanges();
   }
 }
