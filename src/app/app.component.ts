@@ -44,7 +44,15 @@ export class AppComponent implements OnInit {
 
   private initializeApp(): void {
     this.platform.ready().then(async () => {
-      await SplashScreen.hide();
+      if (!this.platform.is('hybrid')) {
+        return;
+      }
+
+      try {
+        await SplashScreen.hide();
+      } catch {
+        // Plugin not available (web or missing native implementation)
+      }
     });
   }
 
@@ -58,7 +66,7 @@ export class AppComponent implements OnInit {
 
         element.classList.add(value);
 
-        if (this.platform.is('android')) {
+        if (this.platform.is('hybrid') && this.platform.is('android')) {
           if (value === 'light') {
             await StatusBar.setBackgroundColor({ color: '#ffffff' });
             await StatusBar.setStyle({ style: Style.Light });
@@ -82,7 +90,7 @@ export class AppComponent implements OnInit {
           return;
         }
 
-        if (this.platform.is('android')) {
+        if (this.platform.is('hybrid') && this.platform.is('android')) {
           await StatusBar.setBackgroundColor({ color: '#ffffff' });
           await StatusBar.setStyle({ style: Style.Light });
 

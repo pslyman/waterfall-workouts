@@ -160,7 +160,7 @@ export class Tab1Page implements OnInit {
     element.classList.add(nextTheme);
     await this.storageService.set("theme", nextTheme);
 
-    if (this.platform.is("android")) {
+    if (this.platform.is("hybrid") && this.platform.is("android")) {
       if (nextTheme === "light") {
         await StatusBar.setBackgroundColor({ color: "#ffffff" });
         await StatusBar.setStyle({ style: Style.Light });
@@ -218,7 +218,7 @@ export class Tab1Page implements OnInit {
   }
 
   async colorValueChange(value: string) {
-    if (this.platform.is("android")) {
+    if (this.platform.is("hybrid") && this.platform.is("android")) {
       if (value === "light") {
         await StatusBar.setBackgroundColor({ color: "#ffffff" });
         await StatusBar.setStyle({ style: Style.Light });
