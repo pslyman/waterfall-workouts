@@ -273,13 +273,41 @@ export class Tab1Page implements OnInit {
   }
 
   sortWorkouts() {
-    this.workoutNames.sort((a, b) =>
-      (a.days / this.getDifferenceBetweenTimes(a.originDate))
-        .toString()
-        .localeCompare(
-          (b.days / this.getDifferenceBetweenTimes(b.originDate)).toString(),
-        ),
-    );
+    const cached = new Map<Workout, { daysSince: number; score: number }>();
+
+    const getMeta = (workout: Workout): { daysSince: number; score: number } => {
+      const existing = cached.get(workout);
+      if (existing) {
+        return existing;
+      }
+
+      const daysSince = this.getDifferenceBetweenTimes(workout.originDate);
+      const allowedDays = workout.days > 0 ? workout.days : 1;
+
+      const meta = {
+        daysSince,
+        // Higher score = more overdue relative to intent (e.g. 12 days since / 10 day cadence = 1.2)
+        score: daysSince / allowedDays,
+      };
+
+      cached.set(workout, meta);
+      return meta;
+    };
+
+    this.workoutNames.sort((a, b) => {
+      const metaA = getMeta(a);
+      const metaB = getMeta(b);
+
+      if (metaB.score !== metaA.score) {
+        return metaB.score - metaA.score;
+      }
+
+      if (metaB.daysSince !== metaA.daysSince) {
+        return metaB.daysSince - metaA.daysSince;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
   }
 
   getCurrentTimeNumber() {
@@ -296,9 +324,8 @@ export class Tab1Page implements OnInit {
 
     const secondDate = this.getCurrentTimeNumber();
 
-    const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
-
-    return diffDays;
+    const diffDays = Math.round((secondDate - firstDate) / oneDay);
+    return Number.isFinite(diffDays) ? Math.max(0, diffDays) : 0;
   }
 
   async itemDone(name: string): Promise<void> {
