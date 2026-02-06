@@ -174,16 +174,6 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  async openInformation(): Promise<void> {
-    const toast = await this.toastController.create({
-      message:
-        'Tap "1 Set" to progress. Use the "..." menu for Done/Restart/Edit/Delete.',
-      duration: 4000,
-    });
-
-    await toast.present();
-  }
-
   async openActionSheet(item: Workout): Promise<void> {
     const actionSheet = await this.actionSheetCtrl.create({
       header: "Actions",
