@@ -35,7 +35,8 @@
       <h2>Click the + button to add a workout</h2>
     </ion-card-content>
   </ion-card>
-  } @if (!newActive) {
+  }
+
   <div [@cardAnimation]="workoutNames.length">
     @for (item of workoutNames; track item) {
     <ion-card>
@@ -98,110 +99,134 @@
     </ion-card>
     }
   </div>
-  } @if (newActive) {
-  <div class="new-add-modal" [@inOutAnimation]>
-    <ion-card>
-      <ion-item>
-        <ion-label position="stacked">*Name</ion-label>
-        <ion-input
-          placeholder="What will you call this workout?"
-          [(ngModel)]="newName"
-        ></ion-input>
-      </ion-item>
-    </ion-card>
-    <ion-card>
-      <ion-item>
-        <ion-label position="stacked">Reps</ion-label>
-        <ion-input
-          type="number"
-          placeholder="Number of reps"
-          [(ngModel)]="newReps"
-        ></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Sets</ion-label>
-        <ion-input
-          type="number"
-          placeholder="Number of sets"
-          [(ngModel)]="newSets"
-        ></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Weight</ion-label>
-        <ion-input
-          type="number"
-          placeholder="How heavy?"
-          [(ngModel)]="newWeight"
-        ></ion-input>
-      </ion-item>
-      <ion-list>
-        <ion-radio-group
-          (ionChange)="radioChange($event)"
-          [(ngModel)]="useMetric"
-        >
+
+  <ion-modal [isOpen]="newActive" (didDismiss)="cancelChanges()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ inEdit ? 'Edit Workout' : 'Add Workout' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancelChanges()">
+              {{ inEdit ? 'Cancel' : 'Close' }}
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-card>
           <ion-item>
-            <ion-label>kg</ion-label>
-            <ion-radio slot="start" value="true"> </ion-radio>
+            <ion-label position="stacked">*Name</ion-label>
+            <ion-input
+              placeholder="What will you call this workout?"
+              [(ngModel)]="newName"
+            ></ion-input>
+          </ion-item>
+        </ion-card>
+
+        <ion-card>
+          <ion-item>
+            <ion-label position="stacked">Reps</ion-label>
+            <ion-input
+              type="number"
+              placeholder="Number of reps"
+              [(ngModel)]="newReps"
+            ></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label>lbs</ion-label>
-            <ion-radio slot="start" value="false"></ion-radio>
-          </ion-item> </ion-radio-group
-      ></ion-list>
-    </ion-card>
-    <ion-card>
-      <ion-item>
-        <ion-label position="stacked">Time </ion-label>
-        <ion-input
-          type="number"
-          placeholder="How long in minutes"
-          [(ngModel)]="newCountdown"
-        ></ion-input>
-      </ion-item>
-    </ion-card>
-    <ion-card>
-      <ion-item>
-        <ion-label position="stacked">*Days (default 3)</ion-label>
-        <ion-input
-          type="number"
-          [(ngModel)]="newDays"
-          placeholder="Max number of days to pass between"
-        ></ion-input>
-      </ion-item>
-    </ion-card>
-    <ion-card>
-      <ion-item>
-        <ion-label position="stacked">Notes</ion-label>
-        <ion-input
-          placeholder="Anything you'll forget?"
-          [(ngModel)]="newNotes"
-        ></ion-input>
-      </ion-item>
-      <ion-item>
-        <p class="required-text">*required</p>
-      </ion-item>
-    </ion-card>
-    <ion-card class="add-workout-bton-container">
-      @if (inEdit) {
-      <ion-button color="danger" (click)="deleteWorkout()">Remove</ion-button>
-      } @if (!inEdit) {
-      <ion-button color="dark" (click)="clearAddWorkout()">Clear</ion-button>
-      }@if (!inEdit) {
-      <ion-button (click)="addNewWorkout()" [disabled]="!this.newName"
-        >Add New Workout</ion-button
-      >
-      }@if (inEdit) {
-      <ion-button (click)="saveChanges()" [disabled]="!this.newName"
-        >Save</ion-button
-      >
-      }<ion-button (click)="cancelChanges()" color="dark"
-        >@if (!inEdit) {
-        <span>Close</span>
-        }@if (inEdit) {
-        <span>Cancel</span>
-        }</ion-button
-      ></ion-card
-    >
-  </div>
-  }
+            <ion-label position="stacked">Sets</ion-label>
+            <ion-input
+              type="number"
+              placeholder="Number of sets"
+              [(ngModel)]="newSets"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Weight</ion-label>
+            <ion-input
+              type="number"
+              placeholder="How heavy?"
+              [(ngModel)]="newWeight"
+            ></ion-input>
+          </ion-item>
+          <ion-list>
+            <ion-radio-group
+              (ionChange)="radioChange($event)"
+              [(ngModel)]="useMetric"
+            >
+              <ion-item>
+                <ion-label>kg</ion-label>
+                <ion-radio slot="start" value="true"></ion-radio>
+              </ion-item>
+              <ion-item>
+                <ion-label>lbs</ion-label>
+                <ion-radio slot="start" value="false"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </ion-card>
+
+        <ion-card>
+          <ion-item>
+            <ion-label position="stacked">Time </ion-label>
+            <ion-input
+              type="number"
+              placeholder="How long in minutes"
+              [(ngModel)]="newCountdown"
+            ></ion-input>
+          </ion-item>
+        </ion-card>
+
+        <ion-card>
+          <ion-item>
+            <ion-label position="stacked">*Days (default 3)</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="newDays"
+              placeholder="Max number of days to pass between"
+            ></ion-input>
+          </ion-item>
+        </ion-card>
+
+        <ion-card>
+          <ion-item>
+            <ion-label position="stacked">Notes</ion-label>
+            <ion-input
+              placeholder="Anything you'll forget?"
+              [(ngModel)]="newNotes"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <p class="required-text">*required</p>
+          </ion-item>
+        </ion-card>
+
+        <ion-card class="add-workout-bton-container">
+          @if (inEdit) {
+          <ion-button color="danger" (click)="deleteWorkout()">Remove</ion-button>
+          }
+
+          @if (!inEdit) {
+          <ion-button color="dark" (click)="clearAddWorkout()">Clear</ion-button>
+          }
+
+          @if (!inEdit) {
+          <ion-button (click)="addNewWorkout()" [disabled]="!newName">
+            Add New Workout
+          </ion-button>
+          }
+
+          @if (inEdit) {
+          <ion-button (click)="saveChanges()" [disabled]="!newName">
+            Save
+          </ion-button>
+          }
+
+          <ion-button (click)="cancelChanges()" color="dark">
+            {{ inEdit ? 'Cancel' : 'Close' }}
+          </ion-button>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

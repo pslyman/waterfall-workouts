@@ -34,36 +34,6 @@ interface Workout {
   templateUrl: "tab1.page.html",
   styleUrls: ["tab1.page.scss"],
   animations: [
-    trigger("inOutAnimation", [
-      transition(":enter", [
-        animate(
-          ".3s ease-out",
-          keyframes([
-            style({
-              opacity: 0,
-              transform: "translateY(-35px) scale(1.05)",
-              offset: 0,
-            }),
-            style({ opacity: 1, transform: "translateY(0)", offset: 1 }),
-          ]),
-        ),
-      ]),
-    ]),
-    [
-      trigger("cardIn", [
-        transition(":enter", [
-          style({ transform: "scale(.8)", top: "75px" }),
-          animate(".5s ease-out", style({ transform: "scale(1)", top: 0 })),
-        ]),
-        transition(":leave", [
-          style({ transform: "scale(1)", top: 0, opacity: 1 }),
-          animate(
-            ".2s ease-out",
-            style({ transform: "scale(.8)", top: "75px", opacity: 0 }),
-          ),
-        ]),
-      ]),
-    ],
     [
       trigger("helpCardIn", [
         transition(":enter", [
