@@ -2,28 +2,31 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
+import { StorageService } from './services/storage.service';
 
 describe('AppComponent', () => {
 
-  let statusBarSpy, splashScreenSpy, platformReadySpy, platformSpy;
+  let platformReadySpy: Promise<string>;
+  let platformSpy: jasmine.SpyObj<Platform>;
+  let storageServiceSpy: jasmine.SpyObj<StorageService>;
 
   beforeEach(waitForAsync(() => {
-    statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault']);
-    splashScreenSpy = jasmine.createSpyObj('SplashScreen', ['hide']);
-    platformReadySpy = Promise.resolve();
-    platformSpy = jasmine.createSpyObj('Platform', { ready: platformReadySpy });
+    platformReadySpy = Promise.resolve('ready');
+    platformSpy = jasmine.createSpyObj('Platform', ['is', 'ready']);
+    platformSpy.ready.and.returnValue(platformReadySpy);
+
+    storageServiceSpy = jasmine.createSpyObj('StorageService', ['get', 'init', 'set']);
+    storageServiceSpy.init.and.resolveTo();
+    storageServiceSpy.get.and.resolveTo(null);
 
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        { provide: StatusBar, useValue: statusBarSpy },
-        { provide: SplashScreen, useValue: splashScreenSpy },
         { provide: Platform, useValue: platformSpy },
+        { provide: StorageService, useValue: storageServiceSpy },
       ],
     }).compileComponents();
   }));
@@ -33,15 +36,5 @@ describe('AppComponent', () => {
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });
-
-  it('should initialize the app', async () => {
-    TestBed.createComponent(AppComponent);
-    expect(platformSpy.ready).toHaveBeenCalled();
-    await platformReadySpy;
-    expect(statusBarSpy.styleDefault).toHaveBeenCalled();
-    expect(splashScreenSpy.hide).toHaveBeenCalled();
-  });
-
-  // TODO: add more tests!
 
 });

@@ -1,23 +1,23 @@
 import {
-  trigger,
-  style,
   animate,
-  transition,
   keyframes,
   query,
   stagger,
+  style,
+  transition,
+  trigger,
 } from "@angular/animations";
 import { Component, OnInit } from "@angular/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import {
-  ToastController,
-  Platform,
   ActionSheetController,
+  AlertController,
+  Platform,
+  ToastController,
 } from "@ionic/angular";
-import { AlertController } from "@ionic/angular";
 import { StorageService } from "../services/storage.service";
 
-interface workoutsInt {
+interface Workout {
   days: number;
   name: string;
   sets: number;
@@ -124,7 +124,7 @@ interface workoutsInt {
   standalone: false,
 })
 export class Tab1Page implements OnInit {
-  workoutNames: workoutsInt[] = [];
+  workoutNames: Workout[] = [];
 
   newName = "";
   newDays = null;
@@ -153,7 +153,7 @@ export class Tab1Page implements OnInit {
   ngOnInit() {
     this.getStorage();
 
-    this.storageService.get("useMetricDefault").then((value) => {
+    this.storageService.get<string>("useMetricDefault").then((value) => {
       if (value) {
         this.useMetric = value;
       } else {
@@ -164,12 +164,15 @@ export class Tab1Page implements OnInit {
 
   toggleMoonlight() {
     this.getStorage();
-    var element = document.getElementById("body-theme");
+    const element = document.getElementById("body-theme");
+    if (!element) {
+      return;
+    }
     element.classList.remove("light");
     element.classList.remove("dark");
     element.classList.remove("amoled");
 
-    this.storageService.get("theme").then(async (value) => {
+    this.storageService.get<string>("theme").then(async (value) => {
       if (value === "light") {
         element.classList.add("dark");
 
@@ -193,11 +196,17 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  openInformation(): void {
-    // placeholder
+  async openInformation(): Promise<void> {
+    const toast = await this.toastController.create({
+      message:
+        'Tap "1 Set" to progress. Use the "..." menu for Done/Restart/Edit/Delete.',
+      duration: 4000,
+    });
+
+    await toast.present();
   }
 
-  async openActionSheet(item: workoutsInt): Promise<void> {
+  async openActionSheet(item: Workout): Promise<void> {
     const actionSheet = await this.actionSheetCtrl.create({
       header: "Actions",
       buttons: [
@@ -258,7 +267,7 @@ export class Tab1Page implements OnInit {
   }
 
   getStorage() {
-    this.storageService.get("workouts").then((list) => {
+    this.storageService.get<string>("workouts").then((list) => {
       if (list) {
         this.workoutNames = JSON.parse(list);
       }
@@ -266,14 +275,6 @@ export class Tab1Page implements OnInit {
   }
 
   sortWorkouts() {
-    this.workoutNames.sort((a, b) =>
-      (this.getDifferenceBetweenTimes(a.originDate) === 0)
-        .toString()
-        .localeCompare(
-          (this.getDifferenceBetweenTimes(a.originDate) === 0).toString(),
-        ),
-    );
-
     this.workoutNames.sort((a, b) =>
       (a.days / this.getDifferenceBetweenTimes(a.originDate))
         .toString()
@@ -284,10 +285,10 @@ export class Tab1Page implements OnInit {
   }
 
   getCurrentTimeNumber() {
-    let d = new Date();
-    let year = d.getFullYear();
-    let month = d.getMonth();
-    let day = d.getDate();
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const day = d.getDate();
 
     return Number(new Date(year, month, day));
   }
@@ -303,9 +304,9 @@ export class Tab1Page implements OnInit {
   }
 
   itemDone(name: string) {
-    let match = this.workoutNames.find((i) => i.name === name);
+    const match = this.workoutNames.find((i) => i.name === name);
 
-    if (!!match) {
+    if (match) {
       match.originDate = this.getCurrentTimeNumber();
     }
 
@@ -313,9 +314,9 @@ export class Tab1Page implements OnInit {
   }
 
   itemRestart(name: string) {
-    let match = this.workoutNames.find((i) => i.name === name);
+    const match = this.workoutNames.find((i) => i.name === name);
 
-    if (!!match) {
+    if (match) {
       match.setsDone = 0;
       match.originDate = this.getCurrentTimeNumber() - 100000000;
     }
@@ -323,9 +324,9 @@ export class Tab1Page implements OnInit {
   }
 
   itemSetSubtraction(name: string) {
-    let match = this.workoutNames.find((i) => i.name === name);
+    const match = this.workoutNames.find((i) => i.name === name);
 
-    if (!!match && match.setsDone != match.sets) {
+    if (match && match.setsDone !== match.sets) {
       match.setsDone++;
 
       if (match.setsDone === match.sets) {
@@ -338,9 +339,9 @@ export class Tab1Page implements OnInit {
 
   // Not currently in use
   itemSetAddition(name: string) {
-    let match = this.workoutNames.find((i) => i.name === name);
+    const match = this.workoutNames.find((i) => i.name === name);
 
-    if (!!match && match.setsDone > 0) {
+    if (match && match.setsDone > 0) {
       match.setsDone--;
     }
     this.saveToStorage();
@@ -365,8 +366,10 @@ export class Tab1Page implements OnInit {
       }
     }
 
-    this.storageService.get("useMetricDefault").then((value) => {
-      this.useMetric = value;
+    this.storageService.get<string>("useMetricDefault").then((value) => {
+      if (value) {
+        this.useMetric = value;
+      }
     });
     if (this.newWeight) {
       if (this.useMetric === "true") {
@@ -434,7 +437,6 @@ export class Tab1Page implements OnInit {
           text: "Cancel",
           role: "cancel",
           cssClass: "secondary",
-          handler: (blah) => {},
         },
         {
           text: "Yes",
@@ -458,11 +460,13 @@ export class Tab1Page implements OnInit {
   }
 
   editItem(itemName) {
-    let match = this.workoutNames.find((i) => i.name === itemName);
-    this.storageService.get("useMetricDefault").then((value) => {
-      this.useMetric = value;
+    const match = this.workoutNames.find((i) => i.name === itemName);
+    this.storageService.get<string>("useMetricDefault").then((value) => {
+      if (value) {
+        this.useMetric = value;
+      }
     });
-    if (!!match) {
+    if (match) {
       this.newName = match.name;
       this.newDays = match.days;
       this.newSets = match.sets;
@@ -494,8 +498,10 @@ export class Tab1Page implements OnInit {
   }
 
   async saveChanges() {
-    this.storageService.get("useMetricDefault").then((value) => {
-      this.useMetric = value;
+    this.storageService.get<string>("useMetricDefault").then((value) => {
+      if (value) {
+        this.useMetric = value;
+      }
     });
     if (this.newWeight) {
       if (this.useMetric === "true") {
@@ -507,9 +513,9 @@ export class Tab1Page implements OnInit {
       }
     }
 
-    let match = this.workoutNames.find((i) => i.name === this.nameOfEditItem);
+    const match = this.workoutNames.find((i) => i.name === this.nameOfEditItem);
 
-    if (!!match) {
+    if (match) {
       match.days = this.newDays;
       match.name = this.newName;
       match.sets = this.newSets;
