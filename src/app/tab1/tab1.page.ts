@@ -342,16 +342,27 @@ export class Tab1Page implements OnInit {
   async itemSetSubtraction(name: string): Promise<void> {
     const match = this.workoutNames.find((i) => i.name === name);
 
-    if (match && match.sets && match.setsDone < match.sets) {
-      match.setsDone++;
-
-      if (match.setsDone === match.sets) {
-        match.setsDone = 0;
-        match.originDate = this.getCurrentTimeNumber();
-      }
+    if (!match || !match.sets || match.setsDone >= match.sets) {
+      return;
     }
 
-    await this.persistWorkouts();
+    match.setsDone++;
+
+    if (match.setsDone === match.sets) {
+      match.setsDone = 0;
+      match.originDate = this.getCurrentTimeNumber();
+    }
+
+    const didSave = await this.persistWorkouts();
+    if (!didSave) {
+      return;
+    }
+
+    const toast = await this.toastController.create({
+      message: `1 set of ${match.name} completed`,
+      duration: 1500,
+    });
+    await toast.present();
   }
 
   // Not currently in use
